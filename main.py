@@ -1,7 +1,9 @@
 import time
 import gclib
 from axis import Axis
-from direction_test import DirectionTest
+from direction_test.dir_test import DirectionTest
+from direction_test.file_writer import save_axis_data
+
 
 def log(message):
     print message
@@ -43,6 +45,7 @@ def begin_test(g):
             if option == 1:
                 test = DirectionTest(log)
                 test.perform_test(axis_a)
+                save_axis_data(axis_a)
             elif option == 2:
                 encoder_test(axis_a)
             elif option == 3:

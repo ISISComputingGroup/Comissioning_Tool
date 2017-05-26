@@ -1,5 +1,6 @@
 from comm_helper import *
 
+
 class Axis():
     JOG_SPEED = 1000
     motor_type = 0

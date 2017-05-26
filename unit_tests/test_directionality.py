@@ -1,5 +1,5 @@
 import unittest
-from direction_test import DirectionTest
+from direction_test.dir_test import DirectionTest
 
 
 class MockAxis():

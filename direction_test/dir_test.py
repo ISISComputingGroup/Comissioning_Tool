@@ -136,3 +136,5 @@ class DirectionTest():
         axis.encoder_type = new_encoder_type
         
         axis.stop()
+
+
