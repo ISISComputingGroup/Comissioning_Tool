@@ -1,8 +1,8 @@
 import unittest
-from comm_helper import *
+from test_program.comm_helper import translate_TS
 
 
-class TestHelper(unittest.TestCase):
+class Test(unittest.TestCase):
     def test_translate_TS_all_zeros(self):
         # Act
         output = translate_TS(0)
@@ -28,6 +28,3 @@ class TestHelper(unittest.TestCase):
         self.assertTrue(output["Motor Off"])
         self.assertTrue(output["Axis Error"])
         self.assertTrue(output["Axis Moving"])
-
-if __name__ == '__main__':
-    unittest.main()

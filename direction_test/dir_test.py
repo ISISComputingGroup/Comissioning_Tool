@@ -1,3 +1,5 @@
+from test_program.comm_helper import STOP_ON_LIMITS
+
 class DirectionTest():
     actually_forward = True
 
@@ -92,7 +94,12 @@ class DirectionTest():
             self.log("Error: Please drive off of limit before starting test")
             return
 
-        axis.download_stop_on_all_limits()
+        """
+        Downloads a simple program into the controller that will stop the motor regardless of direction.
+        This is useful if you do not trust that the limits are the correct way round. However, it will
+        mean that it is impossible to drive off of a limit without code being erased.
+        """
+        axis.download_program_and_execute(STOP_ON_LIMITS)
 
         self.log("Jogging forward...")
         axis.jog()

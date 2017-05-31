@@ -1,5 +1,5 @@
 import unittest
-from direction_test.dir_test import DirectionTest
+from test_program.direction_test.dir_test import DirectionTest
 
 
 class MockAxis():
@@ -11,7 +11,7 @@ class MockAxis():
         return {"Forward Limit": self.forward_hit, "Back Limit": self.backward_hit}
 
 
-class TestHelper(unittest.TestCase):
+class Test(unittest.TestCase):
     def log(self, message):
         print message
 
@@ -150,6 +150,3 @@ class TestHelper(unittest.TestCase):
 
     def test_GIVEN_enc_type_3_and_motor_type_two_and_a_half_WHEN_reverse_calculated_THEN_new_enc_type_13(self):
         self.assertEqual(13, self.dir._calc_reverse_encoder(3, 2.5))
-
-if __name__ == '__main__':
-    unittest.main()

@@ -10,7 +10,6 @@ class Axis():
     def __init__(self, g, axis_letter="A"):
         self.g = g
         self.axis_letter = axis_letter
-        self.helper = Formatter(axis_letter)
 
     def setup(self):
         self.stop()
@@ -18,18 +17,14 @@ class Axis():
         self.motor_type = float(self._send(MOTOR_TYPE, "?"))
         self.encoder_type = int(self._send(CONFIGURE_ENCODER, "?"))
 
-    def download_stop_on_all_limits(self):
-        """
-        Downloads a simple program into the controller that will stop the motor regardless of direction.
-        This is useful if you do not trust that the limits are the correct way round. However, it will
-        mean that it is impossible to drive off of a limit without code being erased.
-        """
-        program = self.helper.get_stop_on_limits(self.STOP_LIM_PROG_NAME)
+    def download_program_and_execute(self, program):
+        prog_name = "name"
+        program = format_command(program, self.axis_letter, prog_name)
         self.g.GProgramDownload(program, '')
-        self._send(EXECUTE_PROGRAM, "#"+self.STOP_LIM_PROG_NAME+",0")
+        self._send(EXECUTE_PROGRAM, "#"+prog_name+",0")
 
     def _send(self, command, parameter=None):
-        to_send = self.helper.format_command(command, parameter)
+        to_send = format_command(command, self.axis_letter, parameter)
         return self.g.GCommand(to_send)
 
     # Jogs the axis (forwards if not specified)
