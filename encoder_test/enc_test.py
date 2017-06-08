@@ -25,7 +25,6 @@ class EncoderTest():
 
         self.log("Moving to start")
         axis.set_position(start)
-        self.g.GMotionComplete(axis.axis_letter)
         self.log("At start")
 
         enc_array = "enc"
@@ -39,11 +38,9 @@ class EncoderTest():
 
         axis.download_program_and_execute(prog)
 
-        axis.set_position(stop)
-
         start = time.time()
 
-        self.g.GMotionComplete(axis.axis_letter)
+        axis.set_position(stop)
 
         self.log("Finished Motion, gathering data")
 

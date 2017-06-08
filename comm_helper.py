@@ -9,6 +9,7 @@ STOP = "ST$ax"
 MOTOR_OFF = "MO$ax"
 TELL_POSITION = "TP$ax"
 SET_POSITION = "PA$ax=$par0"
+POS_REL = "PR$ax=$par0"
 TELL_STEPS = "TD$ax"
 
 AFTER_MOVE = "AM$ax"
@@ -45,19 +46,27 @@ GET_STEPS = "DE${ax}"
 
 STOP_ON_LIMITS = "#$par0;IF (_LF$ax = 0) | (_LR$ax = 0);" + STOP + ";ENDIF;JP #$par0;"
 
-def start_recording(enc_name, steps_name, time_to_record):
+def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
+    """
+    Creates the galil program that will record encoder counts and step values
+    :param enc_name: The name of the encoder count array
+    :param steps_name: The name of the motor step array
+    :param time_to_record: The time to record the array for
+    :return: The program to load into the galil
+    """
     # Set up arrays
     time_between_records = (time_to_record/4000.0) * 1000
     # TODO: This may only record half the motion due to the floor
     rec_num = int(math.floor(math.log(time_between_records, 2)))  # 2^n msec between records
     rec_num = min(rec_num, 8)  # 8 is maximum
+    rec_num = max(rec_num, 1)  # 1 is minimum
 
-    print "REC NUM: " + str(rec_num)
     out = DEALLOCATE_ALL + ";"
     out += CREATE_ARR + ";" + REC_ARR + ";"
     out = _format_parameters(out, enc_name, steps_name)
     out += _format_parameters(REC_DATA, TELL_POSITION, GET_STEPS) + ";"
-    out += AFTER_SPEED + ";"
+    if wait_for_speed:
+        out += AFTER_SPEED + ";"
     out += _format_parameters(START_REC, rec_num) + ";"
     return "#$par0;" + out  # Add the program name on the beginning
 
