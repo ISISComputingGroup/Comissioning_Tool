@@ -7,6 +7,9 @@ class DirectionTest():
         self.log = logger
 
     def _ask_direction(self):
+        """
+        Asks the user which direction the motor is moving (needed to establish outside reference)
+        """
         opt = {"y": True, "n": False}
         while True:
             dir_inp = raw_input("Is the motor moving away from the beam? (Y/N)").lower()
@@ -27,6 +30,11 @@ class DirectionTest():
             return main + 12
 
     def _calc_reverse_motor(self, old_type):
+        """
+        Calculates what the new motor type will be when reversed.
+        :param old_type: The old motor type that needs reversing
+        :return: The new motor type
+        """
         if abs(old_type) == 2.5:
             new_type = 2.0
         elif abs(old_type) == 2.0:
@@ -38,6 +46,12 @@ class DirectionTest():
         return new_type
 
     def _is_direction_correct(self, start_value, end_value):
+        """
+        Calculates whether the direction is correct based on the outside reference value.
+        :param start_value: The starting position of the motor/encoder
+        :param end_value: The end position of the motor/encoder
+        :return:
+        """
         if start_value == end_value:
             raise Exception("Error: Motor not moving")
         else:
@@ -143,5 +157,8 @@ class DirectionTest():
         axis.encoder_type = new_encoder_type
         
         axis.stop()
+
+        self.log("Axis forward limit at: " + str(axis.high_limit))
+        self.log("Axis back limit at: " + str(axis.low_limit))
 
 

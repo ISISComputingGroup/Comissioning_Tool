@@ -1,4 +1,4 @@
-from test_program.comm_helper import *
+from test_program.comm_helper import format_command, MOTOR_TYPE, CONFIGURE_ENCODER
 import string
 
 EPICS_MTR_TYPE = "caput IN:%1:MTR%2{}_MTRTYPE_CMD {}"
@@ -36,11 +36,10 @@ def _conv_motor_type(galil_type):
 
 
 def _get_settings(axis, opt):
-    helper = Formatter(axis.axis_letter)
     out = []
     if opt == 1:
-        out.append(helper.format_command(MOTOR_TYPE, axis.motor_type))
-        out.append(helper.format_command(CONFIGURE_ENCODER, axis.encoder_type))
+        out.append(format_command(axis, MOTOR_TYPE, axis.motor_type))
+        out.append(format_command(axis, CONFIGURE_ENCODER, axis.encoder_type))
     elif opt == 2:
         axis_number = "%02d" % (string.uppercase.index(axis.axis_letter) + 1)
 
