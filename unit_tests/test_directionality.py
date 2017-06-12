@@ -1,5 +1,6 @@
 import unittest
-from test_program.direction_test.dir_test import DirectionTest
+
+from test_program.motor_tests.dir_test import DirectionTest
 
 
 class MockAxis():

@@ -1,5 +1,6 @@
 import unittest
-from test_program.comm_helper import translate_TS
+
+from test_program.comms.comms import translate_TS
 
 
 class Test(unittest.TestCase):

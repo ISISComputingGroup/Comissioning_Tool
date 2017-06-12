@@ -1,13 +1,21 @@
-from test_program.comm_helper import start_recording, STOP_REC
 from random import randint
+
 import numpy as np
+from Tkinter import IntVar
+
+from test_program.comms.comms import start_recording
+from test_program.comms.consts import STOP_REC
+
 
 class BacklashTest():
-    def __init__(self, log, g):
+    def __init__(self, axis, log, g):
+        self.axis = axis
         self.log = log
         self.g = g
         self.enc_array = "enc"
         self.steps_array = "steps"
+
+        self.repeats = IntVar(value=5)
 
         self.prog = start_recording(self.enc_array, self.steps_array, 1, False)
 
@@ -42,25 +50,27 @@ class BacklashTest():
 
         return self._calc_backlash(cnts, steps)
 
-    def perform_test(self, axis, times):
+    def perform_test(self):
         self.log("Moving to centre...")
-        axis.set_position(axis.get_centre())
+        self.axis.set_position(self.axis.get_centre())
 
         # Have to move a little as not sure which way we came to the centre from
-        axis.move_relative(700)
+        self.axis.move_relative(700)
 
         fwd_bl = []
         back_bl = []
 
-        for i in range(times+1):
+        for i in range(self.repeats.get()+1):
             self.log("Testing forward")
-            fwd_bl.append(self._do_one_test(axis))
+            fwd_bl.append(self._do_one_test(self.axis))
 
             self.log("Testing backwards")
-            back_bl.append(self._do_one_test(axis, False))
+            back_bl.append(self._do_one_test(self.axis, False))
 
         fwd_bl = np.array(fwd_bl)
         back_bl = np.array(back_bl)
 
-        print "Forward is {} +/- {}".format(np.mean(fwd_bl), np.std(fwd_bl))
-        print "Back is {} +/- {}".format(np.mean(back_bl), np.std(back_bl))
+        self.log("Forward is {} +/- {}".format(np.mean(fwd_bl), np.std(fwd_bl)))
+        self.log("Back is {} +/- {}".format(np.mean(back_bl), np.std(back_bl)))
+
+        self.log("Backlash test finished")

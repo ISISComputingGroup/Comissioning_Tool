@@ -1,11 +1,16 @@
-from test_program.comm_helper import start_recording
 import time
 import numpy as np
 
+
+from test_program.comms.comms import start_recording
+
+
 GALIL_ARRAY_MAX = 8000
 
+
 class EncoderTest():
-    def __init__(self, logger, g):
+    def __init__(self, axis, logger, g):
+        self.axis = axis
         self.log = logger
         self.g = g
 
@@ -16,8 +21,9 @@ class EncoderTest():
     def _take_full_data_and_save(self, axis, name, forward=True):
         data = self.record_data_between(axis, axis.get_soft_limit(not forward), axis.get_soft_limit(forward))
 
-        name = "data\data_{}_{}_{}.txt".format(axis.axis_letter, axis.JOG_SPEED, name)
+        name = "data\\test_data_{}_{}_{}.txt".format(axis.axis_letter, axis.JOG_SPEED.get(), name)
 
+        self.log("Saving data in {}".format(name))
         np.savetxt(name, data, fmt="%d", delimiter=",")
 
     def record_data_between(self, axis, start, stop):
@@ -31,7 +37,7 @@ class EncoderTest():
         steps_array = "steps"
 
         est_data_trans_time = 6*8*GALIL_ARRAY_MAX/115200
-        est_time = (axis.get_step_range() / axis.JOG_SPEED)
+        est_time = (axis.get_step_range() / axis.JOG_SPEED.get())
 
         self.log("Running test, this will take approx. {} seconds".format(est_time+est_data_trans_time))
         prog = start_recording(enc_array, steps_array, est_time)
@@ -46,16 +52,13 @@ class EncoderTest():
 
         data = np.array([self._get_arr(enc_array), self._get_arr(steps_array)])
 
-        print "Took " + str(time.time()-start) + " secs"
+        self.log("Took " + str(time.time()-start) + " secs")
 
         return data
 
-    def perform_test(self, axis):
-        for sp in [2000,4000,7000]:
-            axis.JOG_SPEED = sp
+    def perform_test(self):
+        self._take_full_data_and_save(self.axis, "forward", True)
 
-            self._take_full_data_and_save(axis, "forward", True)
+        self._take_full_data_and_save(self.axis, "back", False)
 
-            self._take_full_data_and_save(axis, "back", False)
-
-        axis.stop()
+        self.log("Encoder test finished")

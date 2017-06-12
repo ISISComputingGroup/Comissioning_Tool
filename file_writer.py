@@ -1,5 +1,7 @@
-from test_program.comm_helper import format_command, MOTOR_TYPE, CONFIGURE_ENCODER
 import string
+
+from test_program.comms.comms import format_command, MOTOR_TYPE, CONFIGURE_ENCODER
+
 
 EPICS_MTR_TYPE = "caput IN:%1:MTR%2{}_MTRTYPE_CMD {}"
 EPICS_ENC_TYPE = "caput IN:%1:MTR%2{}_MENCTYPE_CMD {}"

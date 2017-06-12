@@ -1,20 +1,27 @@
-from comm_helper import *
+from Tkinter import IntVar, BooleanVar
+
+from test_program.comms.consts import *
+from test_program.comms.comms import format_command, translate_TS
 
 
 class Axis():
-    JOG_SPEED = 3000
     motor_type = 0
     encoder_type = 0
 
-    high_limit = 411587  # The position of the high hard limit (steps)
-    low_limit = 151502
-    offset = 10000  # The offset of the soft limits
+    high_limit = None  # The position of the high hard limit (steps)
+    low_limit = None
 
     STOP_LIM_PROG_NAME = "LIM"
 
     def __init__(self, g, axis_letter="A"):
+
         self.g = g
         self.axis_letter = axis_letter
+
+        self.JOG_SPEED = IntVar(value=3000)
+        self.offset = IntVar()  # The offset of the soft limits
+
+        self.limits_found = BooleanVar(value=False)
 
     def setup(self):
         self.stop()
@@ -37,7 +44,7 @@ class Axis():
     def jog(self, forwards=True):
         self.send(START_AXIS)
         sign = 1 if forwards else -1
-        self.send(JOG, sign*self.JOG_SPEED)
+        self.send(JOG, sign*self.JOG_SPEED.get())
         self.send(BEGIN)
 
     def get_steps(self):
@@ -50,7 +57,7 @@ class Axis():
         """
         Set the position of the axis in steps.
         """
-        self.send(SPEED, self.JOG_SPEED)
+        self.send(SPEED, self.JOG_SPEED.get())
         self.send(START_AXIS)
         self.send(SET_POSITION, steps)
         self.send(BEGIN)
@@ -58,7 +65,7 @@ class Axis():
             self.wait_for_motion()
 
     def move_relative(self, steps, wait_for_motion=True):
-        self.send(SPEED, self.JOG_SPEED)
+        self.send(SPEED, self.JOG_SPEED.get())
         self.send(START_AXIS)
         self.send(POS_REL, steps)
         self.send(BEGIN)
@@ -79,6 +86,8 @@ class Axis():
             self.low_limit = self.get_steps()
         elif result["Forward Limit"]:
             self.high_limit = self.get_steps()
+        if self.low_limit is not None and self.high_limit is not None:
+            self.limits_found.set(True)
         return result
 
     def _set_after_stop(self, comm, data):
@@ -95,23 +104,25 @@ class Axis():
     def wipe_program(self):
         self.g.GProgramDownload('', '')
 
-    def set_soft_limits(self, offset):
-        # TODO: Ensure high/low limit defined
-        self.offset = offset
-        self.send(FORWARD_LIMIT, self.high_limit - offset)
-        self.send(BACK_LIMIT, self.low_limit + offset)
+    def set_soft_limits(self):
+        if self.limits_found.get():
+            self.send(FORWARD_LIMIT, self.high_limit - self.offset.get())
+            self.send(BACK_LIMIT, self.low_limit + self.offset.get())
 
     def get_soft_limit(self, forwards=True):
-        if forwards:
-            return self.high_limit - self.offset
+        if self.limits_found.get():
+            if forwards:
+                return self.high_limit - self.offset.get()
+            else:
+                return self.low_limit + self.offset.get()
         else:
-            return self.low_limit + self.offset
+            return None
 
     def get_centre(self):
         return self.low_limit + (self.high_limit-self.low_limit)//2
 
     def get_step_range(self):
-        return self.high_limit-self.low_limit-2*self.offset
+        return self.high_limit-self.low_limit-2*self.offset.get()
 
     def wait_for_motion(self):
         self.g.GMotionComplete(self.axis_letter)
