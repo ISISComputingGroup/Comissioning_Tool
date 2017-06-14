@@ -1,17 +1,15 @@
-from Tkinter import IntVar, BooleanVar
+from Tkinter import IntVar, BooleanVar, DoubleVar
 
 from test_program.comms.consts import *
 from test_program.comms.comms import format_command, translate_TS
 
 
 class Axis():
-    motor_type = 0
-    encoder_type = 0
-
     high_limit = None  # The position of the high hard limit (steps)
     low_limit = None
 
     STOP_LIM_PROG_NAME = "LIM"
+    MAX_SOFT_LIM = 2147483647
 
     def __init__(self, g, axis_letter="A"):
 
@@ -19,6 +17,10 @@ class Axis():
         self.axis_letter = axis_letter
 
         self.JOG_SPEED = IntVar(value=3000)
+
+        self.motor_type = DoubleVar()
+        self.encoder_type = DoubleVar()
+
         self.offset = IntVar()  # The offset of the soft limits
 
         self.limits_found = BooleanVar(value=False)
@@ -26,8 +28,10 @@ class Axis():
     def setup(self):
         self.stop()
         self.send(CONFIGURE)
-        self.motor_type = float(self.send(MOTOR_TYPE, "?"))
-        self.encoder_type = int(self.send(CONFIGURE_ENCODER, "?"))
+        self.motor_type.set(float(self.send(MOTOR_TYPE, "?")))
+        self.encoder_type.set(int(self.send(CONFIGURE_ENCODER, "?")))
+        self.send(FORWARD_LIMIT, self.MAX_SOFT_LIM)
+        self.send(BACK_LIMIT, -self.MAX_SOFT_LIM)
 
     def download_program_and_execute(self, program):
         prog_name = "name"

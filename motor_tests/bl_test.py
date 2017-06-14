@@ -2,15 +2,17 @@ from random import randint
 
 import numpy as np
 from Tkinter import IntVar
+from ttk import *
 
 from test_program.comms.comms import start_recording
 from test_program.comms.consts import STOP_REC
+from motor_test import MotorTest
 
 
-class BacklashTest():
-    def __init__(self, axis, log, g):
+class BacklashTest(MotorTest):
+    def __init__(self, event_queue, log, axis, g):
+        MotorTest.__init__(self, event_queue, log, "Backlash Test")
         self.axis = axis
-        self.log = log
         self.g = g
         self.enc_array = "enc"
         self.steps_array = "steps"
@@ -73,4 +75,7 @@ class BacklashTest():
         self.log("Forward is {} +/- {}".format(np.mean(fwd_bl), np.std(fwd_bl)))
         self.log("Back is {} +/- {}".format(np.mean(back_bl), np.std(back_bl)))
 
-        self.log("Backlash test finished")
+    def get_settings_ui(self, frame):
+        Label(frame, text="Repeat backlash test: ").grid(column=0, row=0)
+        Entry(frame, textvariable=self.repeats).grid(column=1, row=0)
+        Label(frame, text="times").grid(column=2, row=0)

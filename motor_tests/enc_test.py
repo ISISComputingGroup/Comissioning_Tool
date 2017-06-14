@@ -1,17 +1,16 @@
 import time
 import numpy as np
 
-
 from test_program.comms.comms import start_recording
-
+from motor_test import MotorTest
 
 GALIL_ARRAY_MAX = 8000
 
 
-class EncoderTest():
-    def __init__(self, axis, logger, g):
+class EncoderTest(MotorTest):
+    def __init__(self, event_queue, logger, axis, g):
+        MotorTest.__init__(self, event_queue, logger, "Encoder Test")
         self.axis = axis
-        self.log = logger
         self.g = g
 
     def _get_arr(self, arr_name):
@@ -60,5 +59,3 @@ class EncoderTest():
         self._take_full_data_and_save(self.axis, "forward", True)
 
         self._take_full_data_and_save(self.axis, "back", False)
-
-        self.log("Encoder test finished")
