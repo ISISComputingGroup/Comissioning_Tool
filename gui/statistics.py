@@ -1,5 +1,7 @@
 import numpy as np
-import scipy.stats as stats
+from random import random
+from scipy import interpolate
+from scipy.signal import butter, lfilter
 import os
 
 import matplotlib
@@ -10,6 +12,7 @@ from matplotlib.figure import Figure
 
 from Tkinter import *
 from ttk import *
+import tkFileDialog
 
 
 class Statistics(Frame):
@@ -21,14 +24,42 @@ class Statistics(Frame):
         self.microstepping = IntVar(value=16)
         self.motor_res = DoubleVar(value=0.001)
 
+        self.is_gaussian = BooleanVar(value=False)
+        self.is_gaussian.trace("w", self.replot)
+
+        self.fig = Figure(figsize=(5, 4), dpi=100)
+        self.plot = self.fig.add_subplot(111)
+
         self._create_widgets()
 
-    def plot_gauss_fit(self, errors, label):
-        errors = np.sort(errors)
+    def replot(self, *args):
+        self.plot.clear()
+        if self.is_gaussian.get():
+            for name, errors in self.data.iteritems():
+                self.plot_probability(name, errors[1])
 
-        fit = stats.norm.pdf(errors, np.mean(errors), np.std(errors))
+            self.plot.set_xlabel("Error (microns)")
+            self.plot.set_ylabel("Probability")
+        else:
+            for name, errors in self.data.iteritems():
+                self.plot.plot(errors[0], errors[1], label=name)
 
-        self.plot.plot(errors, fit, label=label)
+            self.plot.set_xlabel("Encoder Value")
+            self.plot.set_ylabel("Error (microns)")
+
+        self.plot.legend()
+        self.fig.canvas.draw()
+
+    def plot_probability(self, label, errors):
+        hist, bins = np.histogram(errors, bins=50, density=True)
+        centers = (bins[:-1] + bins[1:]) / 2
+
+        prob = interpolate.InterpolatedUnivariateSpline(centers, hist)
+
+        color = (random(), random(), random())
+        xp = np.linspace(centers[0], centers[-1], 100)
+        self.plot.plot(centers, hist, '.', color=color)
+        self.plot.plot(xp, prob(xp), '-', color=color, label=label)
 
     def analyse_data(self, name, data):
         i = 0
@@ -40,31 +71,36 @@ class Statistics(Frame):
 
         errors = self.get_errors(data)
 
-        self.data[name] = errors
-
-        self.plot.plot(data[0], errors, label=name)
+        self.data[name] = np.array([data[0], errors])
 
     def analyse_data_from_file(self, filename):
         data = np.loadtxt(filename, delimiter=",")
+        filename = os.path.split(filename)[1].split(".")[0]
         self.analyse_data(filename, data)
 
     def more_details(self):
         window = Toplevel(self)
-        data_grid = Treeview(window, columns=("Max Error", "Mean Error", "Standard Deviation"))
+        u = " ("+unichr(181)+"m)"
+        columns = ("Min Error" + u, "Max Error" + u, "Mean Error" + u, "Standard Deviation" + u)
 
-        data_grid.heading('#0', text="File")
-        data_grid.heading('#1', text="Max Error")
-        data_grid.heading('#2', text="Mean Error")
-        data_grid.heading('#3', text="Standard Deviation")
+        data_grid = Treeview(window, columns=columns)
 
-        for name, err in self.data.iteritems():
+        i = 0
+        data_grid.heading('#{}'.format(i), text="File")
+
+        for c in columns:
+            i += 1
+            data_grid.heading('#{}'.format(i), text=c)
+
+        for name, errors in self.data.iteritems():
+            err = errors[1]
             data_grid.insert('', 0, iid=name, text=name)
-            data_grid.set(name, column=0, value=max(np.max(err), np.min(err), key=abs))
-            data_grid.set(name, column=1, value=np.mean(err))
-            data_grid.set(name, column=2, value=np.std(err))
+            i = 0
+            for v in [np.min(err), np.max(err), np.mean(err), np.std(err)]:
+                data_grid.set(name, column=i, value="{:.3g}".format(v))
+                i += 1
 
         data_grid.pack()
-
 
     def get_errors(self, data):
         b, c = np.polyfit(data[0], data[1], 1)
@@ -77,15 +113,22 @@ class Statistics(Frame):
     def analyse_whole_folder(self, folder):
         files = os.listdir(folder)
         for f in files:
-            if "forward" in f and "test" not in f:
+            if "7000" in f and "test" not in f:
                 filename = os.path.join(folder, f)
 
                 self.analyse_data_from_file(filename)
 
-    def _create_widgets(self):
-        self.fig = Figure(figsize=(5, 4), dpi=100)
-        self.plot = self.fig.add_subplot(111)
+    def _load_data(self):
+        f = tkFileDialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
+        self.analyse_data_from_file(f)
+        self.replot()
 
+    def _clear(self):
+        self.data = dict()
+        self.plot.clear()
+        self.fig.canvas.draw()
+
+    def _create_widgets(self):
         canvas = FigureCanvasTkAgg(self.fig, master=self)
         canvas.show()
         canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
@@ -94,14 +137,14 @@ class Statistics(Frame):
         toolbar.update()
         toolbar.pack(side=BOTTOM)
 
-        Separator(toolbar).pack(side=LEFT, fill=Y, padx="20")
-        Button(toolbar, text="Save Data").pack(side=LEFT, fill=Y)
-        Button(toolbar, text="Load Data").pack(side=LEFT, fill=Y)
-        Button(toolbar, text="More Details", command=self.more_details).pack(side=LEFT, fill=Y, padx="10")
-        Checkbutton(toolbar, text="Gaussian").pack(side=LEFT, fill=Y)
+        Separator(toolbar).pack(side=LEFT, fill=Y, padx="10")
+        Button(toolbar, text="Load", command=self._load_data).pack(side=LEFT, fill=Y)
+        Button(toolbar, text="Clear", command=self._clear).pack(side=LEFT, fill=Y)
+        Button(toolbar, text="More Details", command=self.more_details).pack(side=LEFT, fill=Y)
+        Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(side=LEFT, fill=Y)
 
         canvas._tkcanvas.pack(side=TOP)
 
         self.analyse_whole_folder("data")
 
-        self.plot.legend()
+        self.replot()

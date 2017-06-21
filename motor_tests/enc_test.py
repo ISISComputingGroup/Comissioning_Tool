@@ -9,7 +9,7 @@ GALIL_ARRAY_MAX = 8000
 
 class EncoderTest(MotorTest):
     def __init__(self, event_queue, logger, axis, g):
-        MotorTest.__init__(self, event_queue, logger, "Encoder Test")
+        MotorTest.__init__(self, axis, event_queue, logger, "Encoder Test")
         self.axis = axis
         self.g = g
 
@@ -30,6 +30,7 @@ class EncoderTest(MotorTest):
 
         self.log("Moving to start")
         axis.set_position(start)
+
         self.log("At start")
 
         enc_array = "enc"

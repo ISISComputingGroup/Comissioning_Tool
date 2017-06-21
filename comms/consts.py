@@ -41,4 +41,13 @@ STOP_REC = "RC 0"
 WAIT = "WT ${par0}"
 GET_STEPS = "DE${ax}"
 
+"""
+A simple program into the controller that will stop the motor when it hits a limit regardless of direction.
+This is useful if you do not trust that the limits are the correct way round. However, it will
+mean that it is impossible to drive off of a limit without code being erased.
+"""
 STOP_ON_LIMITS = "#$par0;IF (_LF$ax = 0) | (_LR$ax = 0);" + STOP + ";ENDIF;JP #$par0;"
+
+
+# These commands are safe to send, even if the motor has been manually stopped
+SAFE_COMMS = [STOP, MOTOR_OFF, AFTER_MOVE]

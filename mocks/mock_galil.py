@@ -1,4 +1,6 @@
+import time
 import random
+
 
 class MockGalil():
     def __init__(self, log):
@@ -20,6 +22,7 @@ class MockGalil():
         self.log("Sending {}".format(to_send))
 
     def GMotionComplete(self, axis):
+        time.sleep(2)
         self.log("Waiting for motion on {}".format(axis))
 
     def GArrayUpload(self, name, start, end):

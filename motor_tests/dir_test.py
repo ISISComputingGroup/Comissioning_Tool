@@ -8,7 +8,7 @@ class DirectionTest(MotorTest):
     actually_forward = None
 
     def __init__(self, event_queue, logger, axis):
-        MotorTest.__init__(self, event_queue, logger, "Setup")
+        MotorTest.__init__(self, axis, event_queue, logger, "Setup")
         self.axis = axis
 
     def _ask_direction(self):
@@ -103,17 +103,12 @@ class DirectionTest(MotorTest):
         start_steps = self.axis.get_steps()
         start_pos = self.axis.get_position()
 
+        self.axis.download_program_and_execute(STOP_ON_LIMITS)
+
         switches = self.axis.get_switches_after_move()
         if switches["Forward Limit"] or switches["Back Limit"]:
             self.log("Error: Please drive off of limit before starting test")
             return
-
-        """
-        Downloads a simple program into the controller that will stop the motor regardless of direction.
-        This is useful if you do not trust that the limits are the correct way round. However, it will
-        mean that it is impossible to drive off of a limit without code being erased.
-        """
-        self.axis.download_program_and_execute(STOP_ON_LIMITS)
 
         self.log("Jogging forward...")
         self.axis.jog()
@@ -138,14 +133,17 @@ class DirectionTest(MotorTest):
             new_encoder_type = self.axis.encoder_type.get()
         self.log("CE should be: {}".format(new_encoder_type))
 
+        self.log("Running to check limit...")
+
         if not self._are_switches_correct():
             self.log("Limits incorrect, manually move motor off of limit and rewire them")
             raise Exception("Tests cannot continue until limits rewired")
 
         # Correct software config (CE/MT)
-        self.log("Correcting controller configuration")
-        self.axis.set_encoder_type(new_encoder_type)
-        self.axis.set_motor_type(new_motor_type)
+        if not encoder_correct or not motor_correct:
+            self.log("Correcting controller configuration")
+            self.axis.set_encoder_type(new_encoder_type)
+            self.axis.set_motor_type(new_motor_type)
 
         # Will have to wipe the stop at all limits program here (scary)
         self.log("Moving to other limit to confirm")
@@ -156,11 +154,6 @@ class DirectionTest(MotorTest):
 
         if not self._are_switches_correct():
             raise Exception("Both limits are the same?!?")
-
-        self.axis.motor_type = new_motor_type
-        self.axis.encoder_type = new_encoder_type
-
-        self.axis.stop()
 
         self.log("Axis forward limit at: " + str(self.axis.high_limit))
         self.log("Axis back limit at: " + str(self.axis.low_limit))

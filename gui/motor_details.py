@@ -1,13 +1,14 @@
 from Tkinter import *
 from ttk import *
+import tkMessageBox
 
 
-class Settings(Frame):
+class MotorSettings(Frame):
     SOFT_LABEL = "Soft"
     HARD_LABEL = "Hard"
 
-    def __init__(self, axis, master=None):
-        Frame.__init__(self, master, padding="10")
+    def __init__(self, axis, parent):
+        Frame.__init__(self, parent, padding="10")
         self.axis = axis
 
         self.create_widgets()
@@ -26,6 +27,12 @@ class Settings(Frame):
         self.limits_grid.set(self.SOFT_LABEL, column=0, value=self._conv_limit_repr(self.axis.get_soft_limit(False)))
         self.limits_grid.set(self.SOFT_LABEL, column=1, value=self._conv_limit_repr(self.axis.get_soft_limit(True)))
 
+    def jog_axis(self, forwards):
+        msg = "The motor has not yet been setup. This means the limits could be wrong and cause a crash."
+        msg += " Continue anyway?"
+        if self.axis.limits_found.get() or tkMessageBox.askyesno("Motor Not Setup", msg):
+            self.axis.jog(forwards)
+
     def create_widgets(self):
         heading_txt = "Motor Details for Axis {}".format(self.axis.axis_letter)
         Label(self, text=heading_txt, font="Times 20").grid(column=0, row=0, columnspan=4, pady="10")
@@ -33,8 +40,8 @@ class Settings(Frame):
         Label(self, text="Speed: ").grid(column=0, row=1)
         Entry(self, textvariable=self.axis.JOG_SPEED).grid(column=1, row=1)
 
-        Button(self, text="Jog Forward", command=lambda:self.axis.jog(True)).grid(column=2, row=1)
-        Button(self, text="Jog Backward", command=lambda:self.axis.jog(False)).grid(column=3, row=1)
+        Button(self, text="Jog Forward", command=lambda: self.jog_axis(True)).grid(column=2, row=1)
+        Button(self, text="Jog Backward", command=lambda: self.jog_axis(False)).grid(column=3, row=1)
 
         Label(self, text="Soft Limit Offset: ").grid(column=0, row=2)
         Entry(self, textvariable=self.axis.offset).grid(column=1, row=2)
@@ -54,8 +61,8 @@ class Settings(Frame):
         self._update_lims()
 
         Label(self, text="Motor Type: ").grid(column=0, row=4)
-        Entry(self, textvariable=self.axis.motor_type, state=DISABLED).grid(column=1, row=4)
+        self.mot_type = Entry(self, textvariable=self.axis.motor_type, state=DISABLED).grid(column=1, row=4)
 
         Label(self, text="Encoder Type: ").grid(column=2, row=4)
-        Entry(self, textvariable=self.axis.encoder_type, state=DISABLED).grid(column=3, row=4)
+        self.enc_type = Entry(self, textvariable=self.axis.encoder_type, state=DISABLED).grid(column=3, row=4)
 

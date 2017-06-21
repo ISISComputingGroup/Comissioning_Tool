@@ -1,7 +1,7 @@
 from random import randint
 
 import numpy as np
-from Tkinter import IntVar
+from Tkinter import IntVar, X
 from ttk import *
 
 from test_program.comms.comms import start_recording
@@ -11,7 +11,7 @@ from motor_test import MotorTest
 
 class BacklashTest(MotorTest):
     def __init__(self, event_queue, log, axis, g):
-        MotorTest.__init__(self, event_queue, log, "Backlash Test")
+        MotorTest.__init__(self, axis, event_queue, log, "Backlash Test")
         self.axis = axis
         self.g = g
         self.enc_array = "enc"

@@ -7,7 +7,7 @@ from motor_test import MotorTest
 
 class RepeatabilityTest(MotorTest):
     def __init__(self, event_queue, logger, axis):
-        MotorTest.__init__(self, event_queue, logger, "Repeatability Test")
+        MotorTest.__init__(self, axis, event_queue, logger, "Repeatability Test")
         self.axis = axis
         self.steps = IntVar(value=1000)
         self.repeats = IntVar(value=5)

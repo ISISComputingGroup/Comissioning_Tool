@@ -1,9 +1,10 @@
 from string import Template
 import math
-import gclib
 import serial.tools.list_ports
 from test_program.mocks.mock_galil import MockGalil
 from consts import *
+import gclib
+
 
 def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
     """
@@ -69,7 +70,7 @@ def _check_connection(g):
 
 
 # Searches all the ports for the galil
-def _open_connection(g):
+def open_connection(g):
     #TODO: Use g.GAddresses
 
     default_port = "COM34"
@@ -97,10 +98,10 @@ def _open_connection(g):
 
 
 def create_connection(log):
-    g = MockGalil(log)
-    #g = gclib.py()
+    #g = MockGalil(log)
+    g = gclib.py()
 
-    if not _open_connection(g):
+    if not open_connection(g):
         raise IOError("Error, cannot communicate with galil")
 
     return g

@@ -8,6 +8,8 @@ class Axis():
     high_limit = None  # The position of the high hard limit (steps)
     low_limit = None
 
+    safe_to_move = True
+
     STOP_LIM_PROG_NAME = "LIM"
     MAX_SOFT_LIM = 2147483647
 
@@ -40,6 +42,8 @@ class Axis():
         self.send(EXECUTE_PROGRAM, "#"+prog_name+",0")
 
     def send(self, command, *parameters):
+        if command not in SAFE_COMMS and not self.safe_to_move:
+            raise Exception("Motor has been manually stopped, all tests stopped.")
         to_send = format_command(command, self.axis_letter, *parameters)
         return self.g.GCommand(to_send)
 
@@ -61,12 +65,14 @@ class Axis():
         """
         Set the position of the axis in steps.
         """
-        self.send(SPEED, self.JOG_SPEED.get())
-        self.send(START_AXIS)
-        self.send(SET_POSITION, steps)
-        self.send(BEGIN)
-        if wait_for_motion:
-            self.wait_for_motion()
+        current_pos = self.get_position()
+        if steps != current_pos:
+            self.send(SPEED, self.JOG_SPEED.get())
+            self.send(START_AXIS)
+            self.send(SET_POSITION, steps)
+            self.send(BEGIN)
+            if wait_for_motion:
+                self.wait_for_motion()
 
     def move_relative(self, steps, wait_for_motion=True):
         self.send(SPEED, self.JOG_SPEED.get())
@@ -100,10 +106,12 @@ class Axis():
         self.send(comm, data)
 
     def set_motor_type(self, new_type):
-        self._set_after_stop(MOTOR_TYPE, new_type)
+        self.send(MOTOR_TYPE, new_type)
+        self.motor_type.set(new_type)
 
     def set_encoder_type(self, new_type):
-        self._set_after_stop(CONFIGURE_ENCODER, new_type)
+        self.send(CONFIGURE_ENCODER, new_type)
+        self.encoder_type.set(new_type)
 
     def wipe_program(self):
         self.g.GProgramDownload('', '')
@@ -130,3 +138,18 @@ class Axis():
 
     def wait_for_motion(self):
         self.g.GMotionComplete(self.axis_letter)
+
+
+class LoggingAxis(Axis):
+    def __init__(self, g, axis_letter="B"):
+        Axis.__init__(self, g, axis_letter)
+
+    def download_program_and_execute(self, program):
+        prog_name = "name"
+        print "Downloading: {}".format(format_command(program, self.axis_letter, prog_name))
+        Axis.download_program_and_execute(self, program)
+
+    def send(self, command, *parameters):
+        sent = format_command(command, self.axis_letter, *parameters)
+        print "Sending {}".format(sent)
+        return Axis.send(self, command, *parameters)
