@@ -1,18 +1,19 @@
 from random import randint
 
 import numpy as np
-from Tkinter import IntVar, X
+from Tkinter import IntVar
 from ttk import *
 
-from test_program.comms.comms import start_recording
-from test_program.comms.consts import STOP_REC
+from comms.comms import start_recording
+from comms.consts import STOP_REC
 from motor_test import MotorTest
 
 
 class BacklashTest(MotorTest):
+    name = "Backlash Test"
+
     def __init__(self, event_queue, log, axis, g):
-        MotorTest.__init__(self, axis, event_queue, log, "Backlash Test")
-        self.axis = axis
+        MotorTest.__init__(self, axis, event_queue, log)
         self.g = g
         self.enc_array = "enc"
         self.steps_array = "steps"

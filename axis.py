@@ -1,7 +1,7 @@
 from Tkinter import IntVar, BooleanVar, DoubleVar
 
-from test_program.comms.consts import *
-from test_program.comms.comms import format_command, translate_TS
+from comms.consts import *
+from comms.comms import format_command, translate_TS
 
 
 class Axis():
@@ -13,19 +13,33 @@ class Axis():
     STOP_LIM_PROG_NAME = "LIM"
     MAX_SOFT_LIM = 2147483647
 
-    def __init__(self, g, axis_letter="A"):
-
+    def __init__(self, g, axis_letter="A", old_axis=None):
         self.g = g
         self.axis_letter = axis_letter
-
-        self.JOG_SPEED = IntVar(value=3000)
 
         self.motor_type = DoubleVar()
         self.encoder_type = DoubleVar()
 
-        self.offset = IntVar()  # The offset of the soft limits
+        self.JOG_SPEED = IntVar()
 
+        self.microstep = IntVar()
+        self.motor_res = DoubleVar()
+        self.enc_res = DoubleVar()
+
+        self.offset = IntVar()  # The offset of the soft limits
         self.limits_found = BooleanVar(value=False)
+
+        if old_axis is not None and isinstance(old_axis, Axis):
+            self.JOG_SPEED.set(old_axis.JOG_SPEED.get())
+            self.microstep.set(old_axis.microstep.get())
+            self.motor_res.set(old_axis.motor_res.get())
+            self.enc_res.set(old_axis.enc_res.get())
+        else:
+            self.JOG_SPEED.set(3000)
+
+            self.microstep.set(16)
+            self.motor_res.set(1.0)  # Microns per full step
+            self.enc_res.set(2.5)  # Counts per micron
 
     def setup(self):
         self.stop()
@@ -139,10 +153,21 @@ class Axis():
     def wait_for_motion(self):
         self.g.GMotionComplete(self.axis_letter)
 
+    def __str__(self):
+        str = "For axis: {}\n".format(self.axis_letter)
+        str += "Motor Type: {}\nEncoder Type: {}\n".format(self.motor_type.get(), self.encoder_type.get())
+        str += "Motor Resolution (microns per full step): {}\n".format(self.motor_res.get())
+        str += "Encoder Resolution (counts per micron): {}\n".format(self.enc_res.get())
+        str += "Microsteps: {}\n".format(self.microstep.get())
+        str += "Last tested speed: {}\n".format(self.JOG_SPEED.get())
+        if self.limits_found.get():
+            str += "Distance between limits (steps): {}\n".format(self.high_limit-self.low_limit)
+        return str
+
 
 class LoggingAxis(Axis):
-    def __init__(self, g, axis_letter="B"):
-        Axis.__init__(self, g, axis_letter)
+    def __init__(self, g, axis_letter="A", old_axis=None):
+        Axis.__init__(self, g, axis_letter, old_axis)
 
     def download_program_and_execute(self, program):
         prog_name = "name"

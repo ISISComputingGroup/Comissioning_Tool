@@ -1,7 +1,6 @@
 import numpy as np
 from random import random
 from scipy import interpolate
-from scipy.signal import butter, lfilter
 import os
 
 import matplotlib
@@ -18,11 +17,10 @@ import tkFileDialog
 class Statistics(Frame):
     data = dict()
 
-    def __init__(self, master):
+    def __init__(self, master, axis):
         Frame.__init__(self, master, padding="5")
 
-        self.microstepping = IntVar(value=16)
-        self.motor_res = DoubleVar(value=0.001)
+        self.axis = axis
 
         self.is_gaussian = BooleanVar(value=False)
         self.is_gaussian.trace("w", self.replot)
@@ -105,22 +103,20 @@ class Statistics(Frame):
     def get_errors(self, data):
         b, c = np.polyfit(data[0], data[1], 1)
 
+        b = self.axis.microstep.get()/(self.axis.motor_res.get()*self.axis.enc_res.get())
+
         # Calculate the error from the theoretical value and convert to microns
-        vfunc = np.vectorize(lambda x, y: ((b*x+c)-y)*1000*self.motor_res.get()/self.microstepping.get())
+        vfunc = np.vectorize(lambda x, y: ((b*x+c)-y)*self.axis.motor_res.get()/self.axis.microstep.get())
 
         return vfunc(data[0], data[1])
 
-    def analyse_whole_folder(self, folder):
-        files = os.listdir(folder)
-        for f in files:
-            if "7000" in f and "test" not in f:
-                filename = os.path.join(folder, f)
-
-                self.analyse_data_from_file(filename)
+    def change_axis(self, axis):
+        self.axis = axis
 
     def _load_data(self):
-        f = tkFileDialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
-        self.analyse_data_from_file(f)
+        files = tkFileDialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")], multiple=1)
+        for f in files:
+            self.analyse_data_from_file(f)
         self.replot()
 
     def _clear(self):
@@ -144,7 +140,3 @@ class Statistics(Frame):
         Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(side=LEFT, fill=Y)
 
         canvas._tkcanvas.pack(side=TOP)
-
-        self.analyse_whole_folder("data")
-
-        self.replot()

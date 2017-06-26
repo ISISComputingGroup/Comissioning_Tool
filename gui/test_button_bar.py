@@ -1,11 +1,12 @@
 from Tkinter import *
 import ttk
 import tkMessageBox
+from comms.comms import stop_all
 from threading import Thread
-from test_program.motor_tests.dir_test import DirectionTest
-from test_program.motor_tests.enc_test import EncoderTest
-from test_program.motor_tests.rep_test import RepeatabilityTest
-from test_program.motor_tests.bl_test import BacklashTest
+from motor_tests.dir_test import DirectionTest
+from motor_tests.enc_test import EncoderTest
+from motor_tests.rep_test import RepeatabilityTest
+from motor_tests.bl_test import BacklashTest
 
 
 class TestButtonBar(Frame):
@@ -23,14 +24,22 @@ class TestButtonBar(Frame):
 
         self.create_widgets()
 
+    def change_axis(self, new_axis):
+        self.axis = new_axis
+        self.enable_buttons()
+
     def enable_buttons(self):
         if self.axis.limits_found.get():
             for t in self.test_buttons:
                 t.configure(state=NORMAL)
         else:
+            for t in self.test_buttons:
+                t.configure(state=DISABLED)
+
             self.test_buttons[0].configure(state=NORMAL)
 
-    def _create_test_button(self, test, starting_state=DISABLED):
+    def _create_test_button(self, test_type, starting_state=DISABLED):
+        test = test_type(self.events, self.log, self.axis, self.g)
         test_button = ttk.Button(self, text=test.name, state=starting_state)
         test_button.configure(command=lambda: self.run_test(test))
 
@@ -47,7 +56,7 @@ class TestButtonBar(Frame):
         self.rowconfigure(self.button_idx, weight=1)
 
     def manual_stop(self):
-        self.axis.stop()
+        stop_all(self.g)
         self.axis.safe_to_move = False
         self.enable_buttons()
 
@@ -59,7 +68,7 @@ class TestButtonBar(Frame):
             else:
                 return
 
-        thread = Thread(target=test.run)
+        thread = Thread(target=test.run_test, args=(self.axis,))
         thread.daemon = True
         thread.start()
         for t in self.test_buttons:
@@ -81,17 +90,13 @@ class TestButtonBar(Frame):
         self.parent.toggle_connection()
 
     def create_widgets(self):
-        dir_test = DirectionTest(self.events, self.parent.log, self.axis)
-        self._create_test_button(dir_test, NORMAL)
+        self._create_test_button(DirectionTest, NORMAL)
 
-        enc_test = EncoderTest(self.events, self.log, self.axis, self.g)
-        self._create_test_button(enc_test)
+        self._create_test_button(EncoderTest)
 
-        backlash_test = BacklashTest(self.events, self.log, self.axis, self.g)
-        self._create_test_button(backlash_test)
+        self._create_test_button(BacklashTest)
 
-        repeat_test = RepeatabilityTest(self.events, self.log, self.axis)
-        self._create_test_button(repeat_test)
+        self._create_test_button(RepeatabilityTest)
 
         self.axis.limits_found.trace("w", lambda *args: self.events.put(self.enable_buttons))
 
@@ -100,5 +105,7 @@ class TestButtonBar(Frame):
 
         self.disconnect_button = ttk.Button(self, text="Disconnect", command=self.toggle_connection)
         self._place_button(self.disconnect_button)
+
+        self._place_button(ttk.Button(self, text="Save All", command=self.parent.save_all))
 
         self._place_button(ttk.Button(self, text="Exit", command=self.parent.quit))

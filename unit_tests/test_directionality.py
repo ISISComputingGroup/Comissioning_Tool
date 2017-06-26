@@ -1,7 +1,6 @@
 import unittest
-
 from test_program.motor_tests.dir_test import DirectionTest
-
+from mock import patch
 
 class MockAxis():
     motor_type = 2.0
@@ -12,13 +11,23 @@ class MockAxis():
         return {"Forward Limit": self.forward_hit, "Back Limit": self.backward_hit}
 
 
+class MockEventQueue():
+    def put(self, *args):
+        pass
+
+    def put_and_get(self, *args):
+        return True
+
+
 class Test(unittest.TestCase):
     def log(self, message):
         print message
 
-    def setUp(self):
-        self.dir = DirectionTest(self.log)
+    @patch("test_program.motor_tests.dir_test.MotorTest.__init__")
+    def setUp(self, mock_parent_init):
+        mock_parent_init.return_value = None
         self.axis = MockAxis()
+        self.dir = DirectionTest(MockEventQueue(), self.log, self.axis, None)
 
     def test_GIVEN_equal_positions_WHEN_direction_calculated_THEN_error_raised(self):
         # Assert
@@ -72,7 +81,7 @@ class Test(unittest.TestCase):
 
         # Assert
         with self.assertRaises(Exception):
-            self.dir._are_switches_correct(self.axis)
+            self.dir._are_switches_correct()
 
     def test_GIVEN_both_limits_not_hit_WHEN_switches_calculated_THEN_exception_raised(self):
         # Arrange
@@ -81,7 +90,7 @@ class Test(unittest.TestCase):
 
         # Assert
         with self.assertRaises(Exception):
-            self.dir._are_switches_correct(self.axis)
+            self.dir._are_switches_correct()
 
     def test_GIVEN_actually_forward_and_forward_limit_hit_WHEN_switches_calculated_THEN_correct(self):
         # Arrange
@@ -89,7 +98,7 @@ class Test(unittest.TestCase):
         self.axis.forward_hit = True
 
         # Act
-        correct = self.dir._are_switches_correct(self.axis)
+        correct = self.dir._are_switches_correct()
 
         # Assert
         self.assertTrue(correct)
@@ -100,7 +109,7 @@ class Test(unittest.TestCase):
         self.axis.backward_hit = True
 
         # Act
-        correct = self.dir._are_switches_correct(self.axis)
+        correct = self.dir._are_switches_correct()
 
         # Assert
         self.assertFalse(correct)
@@ -111,7 +120,7 @@ class Test(unittest.TestCase):
         self.axis.backward_hit = True
 
         # Act
-        correct = self.dir._are_switches_correct(self.axis)
+        correct = self.dir._are_switches_correct()
 
         # Assert
         self.assertTrue(correct)
@@ -122,7 +131,7 @@ class Test(unittest.TestCase):
         self.axis.forward_hit = True
 
         # Act
-        correct = self.dir._are_switches_correct(self.axis)
+        correct = self.dir._are_switches_correct()
 
         # Assert
         self.assertFalse(correct)

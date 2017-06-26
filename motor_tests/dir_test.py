@@ -1,22 +1,29 @@
 import tkMessageBox
-import time
 
-from test_program.comms.consts import STOP_ON_LIMITS
+from comms.consts import STOP_ON_LIMITS
 from motor_test import MotorTest
 
+
 class DirectionTest(MotorTest):
+    name = "Setup"
     actually_forward = None
 
-    def __init__(self, event_queue, logger, axis):
-        MotorTest.__init__(self, axis, event_queue, logger, "Setup")
-        self.axis = axis
+    def __init__(self, event_queue, logger, axis, g):
+        MotorTest.__init__(self, axis, event_queue, logger)
+        self.log = logger
+
+    def _limits_connected(self):
+        """
+        Confirms with the user that they have
+        """
+        msg = "Have you confirmed that both limits are wired into the controller?"
+        return tkMessageBox.askyesno("Physical Limits Connection", msg)
 
     def _ask_direction(self):
         """
         Asks the user which direction the motor is moving (needed to establish outside reference)
         """
-        self.actually_forward = tkMessageBox.askyesno("Direction", "Is the motor moving away from the beam? (Y/N)")
-        return
+        return tkMessageBox.askyesno("Direction", "Is the motor moving away from the beam?")
 
     def _calc_reverse_encoder(self, old_encoder_type, new_motor_type):
         main = old_encoder_type % 4
@@ -100,6 +107,10 @@ class DirectionTest(MotorTest):
         """
         Tests the directionality of the axis.
         """
+
+        if not self.event_queue.put_and_get(self._limits_connected):
+            raise Exception("Cannot continue until limits are connected.")
+
         start_steps = self.axis.get_steps()
         start_pos = self.axis.get_position()
 
@@ -113,11 +124,7 @@ class DirectionTest(MotorTest):
         self.log("Jogging forward...")
         self.axis.jog()
 
-        # Need to do this asynchronously as it is ui
-        self.event_queue.put(self._ask_direction)
-
-        while self.actually_forward is None:
-            time.sleep(0.1)
+        self.actually_forward = self.event_queue.put_and_get(self._ask_direction)
 
         motor_correct = self._log_dir_correct("Motor", start_steps, self.axis.get_steps())
         if not motor_correct:

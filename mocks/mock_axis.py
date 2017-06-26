@@ -1,5 +1,5 @@
-from test_program.comms.comms import *
-from test_program.axis import Axis
+from comms.comms import *
+from axis import Axis
 
 
 class MockAxis(Axis):
@@ -10,8 +10,11 @@ class MockAxis(Axis):
     actual_high_lim = 10000
     actual_low_lim = -10000
 
-    def __init__(self, g, axis_letter="A"):
-        Axis.__init__(self, g, axis_letter)
+    def __init__(self, g, axis_letter="A", old_axis=None):
+        Axis.__init__(self, g, axis_letter, old_axis)
+        if axis_letter == "B":
+            self.actual_high_lim *= 2
+            self.actual_low_lim *= 2
 
     def _mock_switches(self):
         if self.current_pos == self.actual_high_lim:

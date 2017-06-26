@@ -4,8 +4,7 @@ import tkMessageBox
 
 
 class MotorTest():
-    def __init__(self, axis, event_queue, logger, name):
-        self.name = name
+    def __init__(self, axis, event_queue, logger):
         self.event_queue = event_queue
         self.log = logger
         self.running = BooleanVar()
@@ -14,8 +13,9 @@ class MotorTest():
     def _error_handler(self, exception):
         tkMessageBox.showerror("Error", exception.message)
 
-    def run(self):
+    def run_test(self, axis):
         self.running.set(True)
+        self.axis = axis
         try:
             self.perform_test()
         except Exception as e:

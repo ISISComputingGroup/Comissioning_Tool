@@ -1,7 +1,7 @@
 from string import Template
 import math
 import serial.tools.list_ports
-from test_program.mocks.mock_galil import MockGalil
+from mocks.mock_galil import MockGalil
 from consts import *
 import gclib
 
@@ -55,6 +55,12 @@ def _format_parameters(command, *parameters):
     return Template(command).safe_substitute(d)
 
 
+def stop_all(g):
+    g.GCommand(format_command(STOP, ""))
+    g.GCommand(format_command(AFTER_MOVE, ""))
+    g.GCommand(format_command(MOTOR_OFF, ""))
+
+
 def format_command(command, axis_letter, *parameters):
     d = dict(ax=axis_letter)
     command = _format_parameters(command, *parameters)
@@ -97,9 +103,11 @@ def open_connection(g):
     return False
 
 
-def create_connection(log):
-    #g = MockGalil(log)
-    g = gclib.py()
+def create_connection(mock=False, log=None):
+    if mock:
+        g = MockGalil(log)
+    else:
+        g = gclib.py()
 
     if not open_connection(g):
         raise IOError("Error, cannot communicate with galil")

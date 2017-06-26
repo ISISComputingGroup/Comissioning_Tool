@@ -6,15 +6,19 @@ from motor_test import MotorTest
 
 
 class RepeatabilityTest(MotorTest):
-    def __init__(self, event_queue, logger, axis):
-        MotorTest.__init__(self, axis, event_queue, logger, "Repeatability Test")
-        self.axis = axis
+    name = "Repeatability Test"
+
+    def __init__(self, event_queue, logger, axis, g):
+        MotorTest.__init__(self, axis, event_queue, logger)
         self.steps = IntVar(value=1000)
         self.repeats = IntVar(value=5)
 
     def _move_and_log(self, axis, steps):
         axis.move_relative(steps)
         return axis.get_steps(), axis.get_position()
+
+    def calculate_error(self, start_pos, end_pos):
+        np.subtract(end_pos, start_pos)
 
     def perform_test(self):
         self.log("Moving to centre...")
@@ -30,6 +34,7 @@ class RepeatabilityTest(MotorTest):
             begin.append(self._move_and_log(self.axis, -self.steps.get()))
 
         d = np.array([begin[0], begin[1], end[0], end[1]])
+
         fname = "data.txt"
         np.savetxt(fname, d, fmt="%d", delimiter=",")
 

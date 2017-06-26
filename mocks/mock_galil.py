@@ -3,6 +3,8 @@ import random
 
 
 class MockGalil():
+    arr_num = 0
+
     def __init__(self, log):
         self.log = log
 
@@ -22,16 +24,19 @@ class MockGalil():
         self.log("Sending {}".format(to_send))
 
     def GMotionComplete(self, axis):
-        time.sleep(2)
+        time.sleep(0.5)
         self.log("Waiting for motion on {}".format(axis))
 
     def GArrayUpload(self, name, start, end):
         if end == -1:
             end = 4000
+
         out = []
         for i in range(start, end):
-            out.append(random.randint(0, 1000))
+            start = self.arr_num*10
+            out.append(random.randint(start, start+10))
         self.log("Uploading array: {}".format(out[0:5]))
+        self.arr_num += 1
         return out
 
     def GClose(self):
