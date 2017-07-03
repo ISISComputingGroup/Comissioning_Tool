@@ -32,11 +32,22 @@ def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
 
 
 def test_bit(int_type, offset):
+    """
+    Utility function to test the bit of an integer
+    :param int_type: The integer to test
+    :param offset: The bit to test
+    :return: True if the bit is high
+    """
     mask = 1 << offset
     return bool(int_type & mask)
 
 
 def translate_TS(returned_data):
+    """
+    Translates the data returned from the TS command on the galil to a human readable dictionary.
+    :param returned_data: The data returned from the command.
+    :return: The dictionary with the data.
+    """
     out = dict()
     out["Latched"] = test_bit(returned_data, 0)
     out["Home"] = test_bit(returned_data, 1)
@@ -56,12 +67,23 @@ def _format_parameters(command, *parameters):
 
 
 def stop_all(g):
+    """
+    Stops all motor axes.
+    :param g: An instance of the galil comms object.
+    """
     g.GCommand(format_command(STOP, ""))
     g.GCommand(format_command(AFTER_MOVE, ""))
     g.GCommand(format_command(MOTOR_OFF, ""))
 
 
 def format_command(command, axis_letter, *parameters):
+    """
+    Takes a galil command and replaces all of the macros.
+    :param command: The galil command to send (see list in consts.py)
+    :param axis_letter: The axis to run the command on.
+    :param parameters: Any parameters the command will take.
+    :return: The command once the macros have been expanded.
+    """
     d = dict(ax=axis_letter)
     command = _format_parameters(command, *parameters)
     return Template(command).substitute(d)
@@ -75,8 +97,12 @@ def _check_connection(g):
     return isinstance(info, str)
 
 
-# Searches all the ports for the galil
 def open_connection(g):
+    """
+    Searches all available COM ports for a connection to a galil and opens it.
+    :param g: A galil comms object.
+    :return: True if connection successful, false otherwise
+    """
     #TODO: Use g.GAddresses
 
     default_port = "COM34"
@@ -104,6 +130,12 @@ def open_connection(g):
 
 
 def create_connection(mock=False, log=None):
+    """
+    Creates a connection to the galil.
+    :param mock: Whether to create a mock connection (used for testing)
+    :param log: The log to print any mock messages.
+    :return: An instance of the galil connection object
+    """
     if mock:
         g = MockGalil(log)
     else:

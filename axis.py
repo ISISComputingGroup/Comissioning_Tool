@@ -5,6 +5,11 @@ from comms.comms import format_command, translate_TS
 
 
 class Axis():
+    """
+    A class that represents a single axis on the controller.
+
+    This class should be used as an abstraction instead of talking directly to the controller.
+    """
     high_limit = None  # The position of the high hard limit (steps)
     low_limit = None
 
@@ -42,6 +47,9 @@ class Axis():
             self.enc_res.set(2.5)  # Counts per micron
 
     def setup(self):
+        """
+        Sets up the motor on first start up.
+        """
         self.stop()
         self.send(CONFIGURE)
         self.motor_type.set(float(self.send(MOTOR_TYPE, "?")))
@@ -50,6 +58,10 @@ class Axis():
         self.send(BACK_LIMIT, -self.MAX_SOFT_LIM)
 
     def download_program_and_execute(self, program):
+        """
+        Downloads a galil program into the controller and executes it.
+        :param program: The program to download
+        """
         prog_name = "name"
         program = format_command(program, self.axis_letter, prog_name)
         self.g.GProgramDownload(program, '')
@@ -61,23 +73,38 @@ class Axis():
         to_send = format_command(command, self.axis_letter, *parameters)
         return self.g.GCommand(to_send)
 
-    # Jogs the axis (forwards if not specified)
-    # WARNING: If this is run without the STOP_ALL_LIMS program being in the controller it could physically crash
+
     def jog(self, forwards=True):
+        """
+        Jogs the axis (forwards if not specified)
+        WARNING: If this is run without the STOP_ALL_LIMS program being in the controller it could physically crash
+        :param forwards: The direction to jog the motor in, True to jog forwards w.r.t the internal motor direction
+                        (default: True)
+        """
         self.send(START_AXIS)
         sign = 1 if forwards else -1
         self.send(JOG, sign*self.JOG_SPEED.get())
         self.send(BEGIN)
 
     def get_steps(self):
+        """
+        Get the number of motor steps the axis is currently at.
+        :return The number of motor steps
+        """
         return int(self.send(TELL_STEPS))
 
     def get_position(self):
+        """
+        Get the position of the encoder on the motor.
+        :return The position of the encoder in counts.
+        """
         return int(self.send(TELL_POSITION))
 
     def set_position(self, steps, wait_for_motion=True):
         """
         Set the position of the axis in steps.
+        :param steps: The step position to go to.
+        :param wait_for_motion: True if the function should block waiting for the motion to finish
         """
         current_pos = self.get_position()
         if steps != current_pos:
@@ -89,6 +116,11 @@ class Axis():
                 self.wait_for_motion()
 
     def move_relative(self, steps, wait_for_motion=True):
+        """
+        Move a number of steps relative to the current position.
+        :param steps: The number of steps to move away from the current position.
+        :param wait_for_motion: True if the function should block waiting for the motion to finish
+        """
         self.send(SPEED, self.JOG_SPEED.get())
         self.send(START_AXIS)
         self.send(POS_REL, steps)
@@ -97,12 +129,18 @@ class Axis():
             self.wait_for_motion()
 
     def stop(self):
+        """
+        Stop this axis.
+        """
         self.send(STOP)
         self.send(AFTER_MOVE)
         self.send(MOTOR_OFF)
 
-    # Gets data once movement has stopped
     def get_switches_after_move(self):
+        """
+        Waits form motion to stop then gets the data for the limit switches
+        :return: Dictionary containing the information from the galil about switches
+        """
         self.wait_for_motion()
         result = self.send(TELL_SWITCHES)
         result = translate_TS(int(result))
@@ -120,17 +158,31 @@ class Axis():
         self.send(comm, data)
 
     def set_motor_type(self, new_type):
+        """
+        Set the motor type of the axis.
+        :param new_type: The new motor type.
+        """
         self.send(MOTOR_TYPE, new_type)
         self.motor_type.set(new_type)
 
     def set_encoder_type(self, new_type):
+        """
+        Set the encoder type of the axis.
+        :param new_type: The new encoder type.
+        """
         self.send(CONFIGURE_ENCODER, new_type)
         self.encoder_type.set(new_type)
 
     def wipe_program(self):
+        """
+        Wipes the program inside the controller by sending an empty program.
+        """
         self.g.GProgramDownload('', '')
 
     def set_soft_limits(self):
+        """
+        Sets the soft limits of the motor based on the already discovered hard limits and the user set offset.
+        """
         if self.limits_found.get():
             self.send(FORWARD_LIMIT, self.high_limit - self.offset.get())
             self.send(BACK_LIMIT, self.low_limit + self.offset.get())
@@ -166,6 +218,9 @@ class Axis():
 
 
 class LoggingAxis(Axis):
+    """
+    An axis that also logs every command that it sends to the controller.
+    """
     def __init__(self, g, axis_letter="A", old_axis=None):
         Axis.__init__(self, g, axis_letter, old_axis)
 

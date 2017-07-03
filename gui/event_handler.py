@@ -3,6 +3,9 @@ from threading import Lock, Thread
 
 
 class EventHandler():
+    """
+    Event handler that listens for new events to send to the UI thread.
+    """
     lock = Lock()
     in_queue = Queue.Queue()
     out_queue = Queue.Queue()
@@ -22,9 +25,16 @@ class EventHandler():
         return self.out_queue.get(True)
 
     def put(self, func):
+        """
+        Puts a function on to the UI thread
+        :param func: The function to perform on the UI thread.
+        """
         self.in_queue.put(func)
 
     def process_queue(self):
+        """
+        The function that is periodically called to check the queue for new events.
+        """
         with self.lock:
             while not self.in_queue.empty():
                 try:
