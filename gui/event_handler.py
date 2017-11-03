@@ -1,4 +1,4 @@
-import Queue
+import queue
 from threading import Lock, Thread
 
 
@@ -7,8 +7,8 @@ class EventHandler():
     Event handler that listens for new events to send to the UI thread.
     """
     lock = Lock()
-    in_queue = Queue.Queue()
-    out_queue = Queue.Queue()
+    in_queue = queue.Queue()
+    out_queue = queue.Queue()
 
     def __init__(self, root):
         self.root = root
@@ -42,6 +42,6 @@ class EventHandler():
                     returned = func()
                     if returned is not None:
                         self.out_queue.put(returned)
-                except Queue.Empty:
+                except queue.Empty:
                     pass
             self.root.after(100, self.process_queue)

@@ -1,6 +1,4 @@
-from Tkinter import *
-import ttk
-import tkMessageBox
+from tkinter import ttk, messagebox, NORMAL, DISABLED, X, BOTH, Button
 from comms.comms import stop_all
 from threading import Thread
 from motor_tests.dir_test import DirectionTest
@@ -9,12 +7,12 @@ from motor_tests.rep_test import RepeatabilityTest
 from motor_tests.bl_test import BacklashTest
 
 
-class TestButtonBar(Frame):
+class TestButtonBar(ttk.Frame):
     button_idx = 0
     test_buttons = []
 
     def __init__(self, axis, settings_panel, parent):
-        Frame.__init__(self, parent)
+        ttk.Frame.__init__(self, parent)
         self.axis = axis
         self.parent = parent
         self.events = parent.events
@@ -63,7 +61,7 @@ class TestButtonBar(Frame):
     def run_test(self, test):
         if not self.axis.safe_to_move:
             msg = "The last motion was manually stopped. Is it now safe to proceed?"
-            if tkMessageBox.askyesno("Motor State", msg):
+            if messagebox.askyesno("Motor State", msg):
                 self.axis.safe_to_move = True
             else:
                 return

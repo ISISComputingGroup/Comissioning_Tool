@@ -1,8 +1,7 @@
 import numpy as np
-from Tkinter import IntVar
-from ttk import *
+from tkinter import IntVar, ttk
 
-from motor_test import MotorTest
+from motor_tests.motor_test import MotorTest
 
 
 class RepeatabilityTest(MotorTest):
@@ -41,8 +40,8 @@ class RepeatabilityTest(MotorTest):
         self.log("Saving in {}".format(fname))
 
     def get_settings_ui(self, frame):
-        Label(frame, text="Move").grid(column=0, row=0)
-        Entry(frame, textvariable=self.steps).grid(column=1, row=0)
-        Label(frame, text="steps and repeat").grid(column=2, row=0)
-        Entry(frame, textvariable=self.repeats).grid(column=3, row=0)
-        Label(frame, text="times.").grid(column=4, row=0)
+        ttk.Label(frame, text="Move").grid(column=0, row=0)
+        ttk.Entry(frame, textvariable=self.steps).grid(column=1, row=0)
+        ttk.Label(frame, text="steps and repeat").grid(column=2, row=0)
+        ttk.Entry(frame, textvariable=self.repeats).grid(column=3, row=0)
+        ttk.Label(frame, text="times.").grid(column=4, row=0)

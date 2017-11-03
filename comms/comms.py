@@ -2,7 +2,7 @@ from string import Template
 import math
 import serial.tools.list_ports
 from mocks.mock_galil import MockGalil
-from consts import *
+from comms.consts import *
 import gclib
 
 

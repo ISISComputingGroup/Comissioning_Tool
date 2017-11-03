@@ -1,12 +1,11 @@
 from random import randint
 
 import numpy as np
-from Tkinter import IntVar
-from ttk import *
+from tkinter import IntVar, ttk
 
 from comms.comms import start_recording
 from comms.consts import STOP_REC
-from motor_test import MotorTest
+from motor_tests.motor_test import MotorTest
 
 
 class BacklashTest(MotorTest):
@@ -77,6 +76,6 @@ class BacklashTest(MotorTest):
         self.log("Back is {} +/- {}".format(np.mean(back_bl), np.std(back_bl)))
 
     def get_settings_ui(self, frame):
-        Label(frame, text="Repeat backlash test: ").grid(column=0, row=0)
-        Entry(frame, textvariable=self.repeats).grid(column=1, row=0)
-        Label(frame, text="times").grid(column=2, row=0)
+        ttk.Label(frame, text="Repeat backlash test: ").grid(column=0, row=0)
+        ttk.Entry(frame, textvariable=self.repeats).grid(column=1, row=0)
+        ttk.Label(frame, text="times").grid(column=2, row=0)

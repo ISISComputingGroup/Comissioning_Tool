@@ -9,16 +9,14 @@ matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 
-from Tkinter import *
-from ttk import *
-import tkFileDialog
+from tkinter import ttk, BooleanVar, Toplevel, filedialog, TOP, BOTTOM, BOTH, LEFT, Y
 
 
-class Statistics(Frame):
+class Statistics(ttk.Frame):
     data = dict()
 
     def __init__(self, master, axis):
-        Frame.__init__(self, master, padding="5")
+        ttk.Frame.__init__(self, master, padding="5")
 
         self.axis = axis
 
@@ -33,13 +31,13 @@ class Statistics(Frame):
     def replot(self, *args):
         self.plot.clear()
         if self.is_gaussian.get():
-            for name, errors in self.data.iteritems():
+            for name, errors in self.data.iter():
                 self.plot_probability(name, errors[1])
 
             self.plot.set_xlabel("Error (microns)")
             self.plot.set_ylabel("Probability")
         else:
-            for name, errors in self.data.iteritems():
+            for name, errors in self.data.iter():
                 self.plot.plot(errors[0], errors[1], label=name)
 
             self.plot.set_xlabel("Encoder Value")
@@ -78,10 +76,10 @@ class Statistics(Frame):
 
     def more_details(self):
         window = Toplevel(self)
-        u = " ("+unichr(181)+"m)"
+        u = " ("+chr(181)+"m)"
         columns = ("Min Error" + u, "Max Error" + u, "Mean Error" + u, "Standard Deviation" + u)
 
-        data_grid = Treeview(window, columns=columns)
+        data_grid = ttk.Treeview(window, columns=columns)
 
         i = 0
         data_grid.heading('#{}'.format(i), text="File")
@@ -114,7 +112,7 @@ class Statistics(Frame):
         self.axis = axis
 
     def _load_data(self):
-        files = tkFileDialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")], multiple=1)
+        files = filedialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")], multiple=1)
         for f in files:
             self.analyse_data_from_file(f)
         self.replot()
@@ -133,10 +131,10 @@ class Statistics(Frame):
         toolbar.update()
         toolbar.pack(side=BOTTOM)
 
-        Separator(toolbar).pack(side=LEFT, fill=Y, padx="10")
-        Button(toolbar, text="Load", command=self._load_data).pack(side=LEFT, fill=Y)
-        Button(toolbar, text="Clear", command=self._clear).pack(side=LEFT, fill=Y)
-        Button(toolbar, text="More Details", command=self.more_details).pack(side=LEFT, fill=Y)
-        Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(side=LEFT, fill=Y)
+        ttk.Separator(toolbar).pack(side=LEFT, fill=Y, padx="10")
+        ttk.Button(toolbar, text="Load", command=self._load_data).pack(side=LEFT, fill=Y)
+        ttk.Button(toolbar, text="Clear", command=self._clear).pack(side=LEFT, fill=Y)
+        ttk.Button(toolbar, text="More Details", command=self.more_details).pack(side=LEFT, fill=Y)
+        ttk.Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(side=LEFT, fill=Y)
 
         canvas._tkcanvas.pack(side=TOP)

@@ -1,4 +1,4 @@
-from Tkinter import IntVar, BooleanVar, DoubleVar
+from tkinter import IntVar, BooleanVar, DoubleVar
 
 from comms.consts import *
 from comms.comms import format_command, translate_TS
@@ -226,10 +226,10 @@ class LoggingAxis(Axis):
 
     def download_program_and_execute(self, program):
         prog_name = "name"
-        print "Downloading: {}".format(format_command(program, self.axis_letter, prog_name))
+        print("Downloading: {}".format(format_command(program, self.axis_letter, prog_name)))
         Axis.download_program_and_execute(self, program)
 
     def send(self, command, *parameters):
         sent = format_command(command, self.axis_letter, *parameters)
-        print "Sending {}".format(sent)
+        print("Sending {}".format(sent))
         return Axis.send(self, command, *parameters)

@@ -9,7 +9,7 @@ class MockGalil():
         self.log = log
 
     def GOpen(self, port):
-        print "Opening on {}".format(port)
+        print("Opening on {}".format(port))
 
     def GInfo(self):
         return "string"

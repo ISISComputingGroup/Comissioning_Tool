@@ -1,1 +1,1 @@
-pip install test
+pip install pyserial

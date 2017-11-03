@@ -1,11 +1,9 @@
 import time
 import numpy as np
-from Tkinter import StringVar, W, E
-from ttk import *
-import tkMessageBox
+from tkinter import StringVar, W, E, ttk, messagebox
 
 from comms.comms import start_recording
-from motor_test import MotorTest
+from motor_tests.motor_test import MotorTest
 
 GALIL_ARRAY_MAX = 8000
 
@@ -85,18 +83,18 @@ class EncoderTest(MotorTest):
 
     def _path_help(self):
         help_msg = "The path can include the following macros:"
-        help_msg += "\n  " + unichr(2022) + "  {axis}: The name of the axis the test was run on"
-        help_msg += "\n  " + unichr(2022) + "  {velo}: The speed the test was run at"
-        help_msg += "\n  " + unichr(2022) + "  {dir}: The direction the test was run in"
+        help_msg += "\n  " + chr(2022) + "  {axis}: The name of the axis the test was run on"
+        help_msg += "\n  " + chr(2022) + "  {velo}: The speed the test was run at"
+        help_msg += "\n  " + chr(2022) + "  {dir}: The direction the test was run in"
         help_msg += '\n\n e.g. "data_{axis}_{velo}_{dir}" becomes "data_A_3000_forwards"'
         help_msg += "\n\n Unless otherwise specified data is saved as a csv file"
-        tkMessageBox.showinfo("Path Help", help_msg)
+        messagebox.showinfo("Path Help", help_msg)
 
     def get_settings_ui(self, frame):
         frame.grid_columnconfigure(1, weight=1)
-        Label(frame, text="Save as: ").grid(column=0, row=0)
-        Entry(frame, textvariable=self.save_path).grid(column=1, row=0, padx=5, sticky=W+E)
-        Button(frame, text="?", command=self._path_help, width=5).grid(column=2, row=0, sticky=E)
+        ttk.Label(frame, text="Save as: ").grid(column=0, row=0)
+        ttk.Entry(frame, textvariable=self.save_path).grid(column=1, row=0, padx=5, sticky=W+E)
+        ttk.Button(frame, text="?", command=self._path_help, width=5).grid(column=2, row=0, sticky=E)
 
-        Label(frame, text="Test direction: ").grid(column=0, row=1)
-        OptionMenu(frame, self.direction, self.dir_opts[2], *self.dir_opts).grid(column=1, row=1, sticky=W)
+        ttk.Label(frame, text="Test direction: ").grid(column=0, row=1)
+        ttk.OptionMenu(frame, self.direction, self.dir_opts[2], *self.dir_opts).grid(column=1, row=1, sticky=W)

@@ -1,11 +1,9 @@
-from Tkinter import *
-from ttk import *
-import tkMessageBox
+from tkinter import StringVar, ttk, messagebox, E, W, DISABLED, NORMAL
 
 lim_repr = lambda lim: "Unknown" if lim is None else lim
 
 
-class MotorSettings(Frame):
+class MotorSettings(ttk.Frame):
     SOFT_LABEL = "Soft"
     HARD_LABEL = "Hard"
 
@@ -13,7 +11,7 @@ class MotorSettings(Frame):
     axis_bound_controls = dict()
 
     def __init__(self, axis, parent, par_change_axis):
-        Frame.__init__(self, parent, padding="10")
+        ttk.Frame.__init__(self, parent, padding="10")
         self.axis = axis
 
         self.chosen_axis = StringVar(value=self.axis.axis_letter)
@@ -47,7 +45,7 @@ class MotorSettings(Frame):
 
     def bind_axis(self, new_axis):
         self.axis = new_axis
-        for con, bind in self.axis_bound_controls.iteritems():
+        for con, bind in self.axis_bound_controls.items():
             con["textvariable"] = getattr(self.axis, bind)
         self.axis.limits_found.trace("w", self._update_lims)
         self._update_lims()
@@ -67,12 +65,12 @@ class MotorSettings(Frame):
     def jog_axis(self, forwards):
         msg = "The motor has not yet been setup. This means the limits could be wrong and cause a crash."
         msg += " Continue anyway?"
-        if self.axis.limits_found.get() or tkMessageBox.askyesno("Motor Not Setup", msg):
+        if self.axis.limits_found.get() or messagebox.askyesno("Motor Not Setup", msg):
             self.axis.jog(forwards)
 
     def _create_bound_entry(self, col, row, attr, parent=None, **opts):
-        e = Entry(self) if parent is None else Entry(parent)
-        for k, v in opts.iteritems():
+        e = ttk.Entry(self) if parent is None else ttk.Entry(parent)
+        for k, v in opts.items():
             e[k] = v
         e.grid(column=col, row=row)
         self.axis_bound_controls[e] = attr
@@ -81,24 +79,24 @@ class MotorSettings(Frame):
     def create_widgets(self):
         available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
 
-        Style().configure("head.TMenubutton", font="Times 20")
-        Label(self, text="Axis under test: ", font="Times 20").grid(column=0, row=0, columnspan=2, pady="10", sticky=E)
-        axes = OptionMenu(self, self.chosen_axis, self.axis.axis_letter, *available_axes, style="head.TMenubutton")
+        ttk.Style().configure("head.TMenubutton", font="Times 20")
+        ttk.Label(self, text="Axis under test: ", font="Times 20").grid(column=0, row=0, columnspan=2, pady="10", sticky=E)
+        axes = ttk.OptionMenu(self, self.chosen_axis, self.axis.axis_letter, *available_axes, style="head.TMenubutton")
         axes.grid(column=2, row=0, sticky=W)
 
-        Label(self, text="Speed (steps/s): ").grid(column=0, row=1)
+        ttk.Label(self, text="Speed (steps/s): ").grid(column=0, row=1)
         self._create_bound_entry(1, 1, "JOG_SPEED")
 
-        Button(self, text="Jog Forward", command=lambda: self.jog_axis(True)).grid(column=2, row=1)
-        Button(self, text="Jog Backward", command=lambda: self.jog_axis(False)).grid(column=3, row=1)
+        ttk.Button(self, text="Jog Forward", command=lambda: self.jog_axis(True)).grid(column=2, row=1)
+        ttk.Button(self, text="Jog Backward", command=lambda: self.jog_axis(False)).grid(column=3, row=1)
 
-        Label(self, text="Soft Limit Offset (steps): ").grid(column=0, row=2)
+        ttk.Label(self, text="Soft Limit Offset (steps): ").grid(column=0, row=2)
         self._create_bound_entry(1, 2, "offset")
 
-        self.set_lims = Button(self, text="Set Limits", state=DISABLED, command=self._set_soft_limits)
+        self.set_lims = ttk.Button(self, text="Set Limits", state=DISABLED, command=self._set_soft_limits)
         self.set_lims.grid(column=2, row=2)
 
-        self.limits_grid = Treeview(self, columns=("Lower Limit", "Upper Limit"), height=3)
+        self.limits_grid = ttk.Treeview(self, columns=("Lower Limit", "Upper Limit"), height=3)
         self.limits_grid.heading('#0', text="Limit Type")
         self.limits_grid.heading('#1', text="Lower Limit (steps)")
         self.limits_grid.heading('#2', text="Upper Limit (steps)")
@@ -106,32 +104,33 @@ class MotorSettings(Frame):
         self.limits_grid.insert('', 1, iid=self.SOFT_LABEL, text=self.SOFT_LABEL)
         self.limits_grid.grid(column=0, row=3, columnspan=4, padx="40", pady="10")
 
-        Label(self, text="Motor Type: ").grid(column=0, row=4)
+        ttk.Label(self, text="Motor Type: ").grid(column=0, row=4)
         self._create_bound_entry(1, 4, "motor_type", state=DISABLED)
 
-        Label(self, text="Encoder Type: ").grid(column=2, row=4)
+        ttk.Label(self, text="Encoder Type: ").grid(column=2, row=4)
         self._create_bound_entry(3, 4, "encoder_type", state=DISABLED)
 
-        res = LabelFrame(self, text="Resolution Settings", padding=5)
+        res = ttk.LabelFrame(self, text="Resolution Settings", padding=5)
         res.grid(column=0, columnspan=4, row=5, pady=10)
 
-        Label(res, text="Motor Resolution ("+unichr(181)+"m/full step):").grid(column=0, row=0, pady=5, padx=5)
+        motor_res_text = "Motor Resolution ({}m/full step):".format(chr(181))
+        ttk.Label(res, text=motor_res_text).grid(column=0, row=0, pady=5, padx=5)
         self._create_bound_entry(1, 0, "motor_res", res)
 
-        Label(res, text="Microstepping (steps/full step):").grid(column=2, row=0, padx=5)
+        ttk.Label(res, text="Microstepping (steps/full step):").grid(column=2, row=0, padx=5)
         self._create_bound_entry(3, 0, "microstep", res)
 
-        Label(res, text="Encoder Resolution (counts/"+unichr(181)+"m)").grid(column=0, row=1, padx=5)
+        ttk.Label(res, text="Encoder Resolution (counts/"+chr(181)+"m)").grid(column=0, row=1, padx=5)
         self._create_bound_entry(1, 1, "enc_res", res)
 
-        calc = LabelFrame(self, text="Calculator", padding=5)
+        calc = ttk.LabelFrame(self, text="Calculator", padding=5)
         calc.grid(column=0, columnspan=4, row=6)
 
-        Label(calc, text="Motor Steps:").grid(column=0, row=0, pady=5)
-        Entry(calc, textvariable=self.calc_steps).grid(column=1, row=0, padx=5)
-        Label(calc, text="Encoder Counts:").grid(column=2, row=0)
-        Entry(calc, textvariable=self.calc_cnts).grid(column=3, row=0, padx=5)
-        Label(calc, text="Microns:").grid(column=4, row=0)
-        Entry(calc, textvariable=self.calc_pos).grid(column=5, row=0, padx=5)
+        ttk.Label(calc, text="Motor Steps:").grid(column=0, row=0, pady=5)
+        ttk.Entry(calc, textvariable=self.calc_steps).grid(column=1, row=0, padx=5)
+        ttk.Label(calc, text="Encoder Counts:").grid(column=2, row=0)
+        ttk.Entry(calc, textvariable=self.calc_cnts).grid(column=3, row=0, padx=5)
+        ttk.Label(calc, text="Microns:").grid(column=4, row=0)
+        ttk.Entry(calc, textvariable=self.calc_pos).grid(column=5, row=0, padx=5)
 
 

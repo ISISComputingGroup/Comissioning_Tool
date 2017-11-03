@@ -1,13 +1,11 @@
-from Tkinter import *
-import ttk
-import tkMessageBox, tkFileDialog
+from tkinter import ttk, messagebox, filedialog, N, S, E, W, HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, Text
 import os
 from datetime import date
 
-from test_button_bar import TestButtonBar
-from event_handler import EventHandler
-from motor_details import MotorSettings
-from statistics import Statistics
+from gui.test_button_bar import TestButtonBar
+from gui.event_handler import EventHandler
+from gui.motor_details import MotorSettings
+from gui.statistics import Statistics
 from mocks.mock_axis import MockAxis
 from axis import LoggingAxis
 from comms.comms import create_connection, open_connection
@@ -35,7 +33,7 @@ class App(ttk.Frame):
             msg += "\n   No other programs are communicating with the Galil."
             msg += "\n   The Galil is communicating at 115200 baud."
 
-            tkMessageBox.showerror("Cannot Connect", msg)
+            messagebox.showerror("Cannot Connect", msg)
             self.quit()
 
         self.current_axis = self._create_axis("A", mock_connection)
@@ -91,7 +89,7 @@ class App(ttk.Frame):
 
     def save_all(self):
         try:
-            fname = tkFileDialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
+            fname = filedialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
 
             out = "Test performed on {}\n".format(date.today().strftime("%d/%m/%y"))
             for axis in self.axes.values():
@@ -118,7 +116,7 @@ class App(ttk.Frame):
         self.mot_details.pack(fill=BOTH, expand=1)
         notebook.add(self.mot_details, text="Motor Settings")
 
-        test_settings = Frame(notebook)
+        test_settings = ttk.Frame(notebook)
         notebook.add(test_settings, text="Test Settings")
         rhs.add(notebook)
 

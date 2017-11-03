@@ -1,7 +1,7 @@
-import tkMessageBox
+from tkinter import messagebox
 
 from comms.consts import STOP_ON_LIMITS
-from motor_test import MotorTest
+from motor_tests.motor_test import MotorTest
 
 
 class DirectionTest(MotorTest):
@@ -17,13 +17,13 @@ class DirectionTest(MotorTest):
         Confirms with the user that they have
         """
         msg = "Have you confirmed that both limits are wired into the controller?"
-        return tkMessageBox.askyesno("Physical Limits Connection", msg)
+        return messagebox.askyesno("Physical Limits Connection", msg)
 
     def _ask_direction(self):
         """
         Asks the user which direction the motor is moving (needed to establish outside reference)
         """
-        return tkMessageBox.askyesno("Direction", "Is the motor moving away from the beam?")
+        return messagebox.askyesno("Direction", "Is the motor moving away from the beam?")
 
     def _calc_reverse_encoder(self, old_encoder_type, new_motor_type):
         main = old_encoder_type % 4
