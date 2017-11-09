@@ -4,7 +4,7 @@ from comms.consts import *
 from comms.comms import format_command, translate_TS
 
 
-class Axis():
+class Axis:
     """
     A class that represents a single axis on the controller.
 

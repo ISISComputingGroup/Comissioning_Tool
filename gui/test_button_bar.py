@@ -2,9 +2,9 @@ from tkinter import ttk, messagebox, NORMAL, DISABLED, X, BOTH, Button
 from comms.comms import stop_all
 from threading import Thread
 from motor_tests.dir_test import DirectionTest
-from motor_tests.enc_test import EncoderTest
+from motor_tests.encoder_test import EncoderTest
 from motor_tests.rep_test import RepeatabilityTest
-from motor_tests.bl_test import BacklashTest
+from motor_tests.back_lash_test import BacklashTest
 
 
 class TestButtonBar(ttk.Frame):

@@ -2,3 +2,4 @@ pyserial=3.4
 numpy=1.13.3
 scipy=1.0.0
 matplotlib=2.1.0
+mock=2.0.0

@@ -1,6 +1,7 @@
 import unittest
-from test_program.motor_tests.dir_test import DirectionTest
+from motor_tests.dir_test import DirectionTest
 from mock import patch
+
 
 class MockAxis():
     motor_type = 2.0
@@ -20,14 +21,10 @@ class MockEventQueue():
 
 
 class Test(unittest.TestCase):
-    def log(self, message):
-        print message
-
-    @patch("test_program.motor_tests.dir_test.MotorTest.__init__")
-    def setUp(self, mock_parent_init):
-        mock_parent_init.return_value = None
+    @patch("tkinter.Variable.__init__")
+    def setUp(self, mock_tkinter):
         self.axis = MockAxis()
-        self.dir = DirectionTest(MockEventQueue(), self.log, self.axis, None)
+        self.dir = DirectionTest(MockEventQueue(), lambda x: None, self.axis, None)
 
     def test_GIVEN_equal_positions_WHEN_direction_calculated_THEN_error_raised(self):
         # Assert

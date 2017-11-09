@@ -5,14 +5,14 @@ from tkinter import IntVar, ttk
 
 from comms.comms import start_recording
 from comms.consts import STOP_REC
-from motor_tests.motor_test import MotorTest
+from motor_tests.generic_test import MotorTest
 
 
 class BacklashTest(MotorTest):
     name = "Backlash Test"
 
     def __init__(self, event_queue, log, axis, g):
-        MotorTest.__init__(self, axis, event_queue, log)
+        super().__init__(axis, event_queue, log)
         self.g = g
         self.enc_array = "enc"
         self.steps_array = "steps"

@@ -3,7 +3,7 @@ import numpy as np
 from tkinter import StringVar, W, E, ttk, messagebox
 
 from comms.comms import start_recording
-from motor_tests.motor_test import MotorTest
+from motor_tests.generic_test import MotorTest
 
 GALIL_ARRAY_MAX = 8000
 
@@ -16,7 +16,7 @@ class EncoderTest(MotorTest):
     dir_opts = ["FORWARDS", "BACKWARDS", "BOTH"]
 
     def __init__(self, event_queue, logger, axis, g):
-        MotorTest.__init__(self, axis, event_queue, logger)
+        super().__init__(axis, event_queue, logger)
 
         self.save_path = StringVar(value="data\\test_data_{axis}_{velo}_{dir}")
         self.direction = StringVar()

@@ -2,7 +2,7 @@ from tkinter import messagebox, BooleanVar
 from functools import partial
 
 
-class MotorTest():
+class MotorTest:
     """
     An interface for a generic test to be performed on an axis.
     """

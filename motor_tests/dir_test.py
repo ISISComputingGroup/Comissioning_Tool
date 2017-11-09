@@ -1,7 +1,7 @@
 from tkinter import messagebox
 
 from comms.consts import STOP_ON_LIMITS
-from motor_tests.motor_test import MotorTest
+from motor_tests.generic_test import MotorTest
 
 
 class DirectionTest(MotorTest):
@@ -9,12 +9,12 @@ class DirectionTest(MotorTest):
     actually_forward = None
 
     def __init__(self, event_queue, logger, axis, g):
-        MotorTest.__init__(self, axis, event_queue, logger)
+        super().__init__(axis, event_queue, logger)
         self.log = logger
 
     def _limits_connected(self):
         """
-        Confirms with the user that they have
+        Confirms with the user that they have checked the limits
         """
         msg = "Have you confirmed that both limits are wired into the controller?"
         return messagebox.askyesno("Physical Limits Connection", msg)
