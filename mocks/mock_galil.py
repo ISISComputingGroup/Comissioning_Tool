@@ -22,6 +22,7 @@ class MockGalil():
 
     def GCommand(self, to_send):
         self.log("Sending {}".format(to_send))
+        return ""
 
     def GMotionComplete(self, axis):
         time.sleep(0.5)

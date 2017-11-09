@@ -69,9 +69,7 @@ class MotorSettings(ttk.Frame):
             self.axis.jog(forwards)
 
     def _create_bound_entry(self, col, row, attr, parent=None, **opts):
-        e = ttk.Entry(self) if parent is None else ttk.Entry(parent)
-        for k, v in opts.items():
-            e[k] = v
+        e = ttk.Entry(self) if parent is None else ttk.Entry(parent, opts)
         e.grid(column=col, row=row)
         self.axis_bound_controls[e] = attr
         return e

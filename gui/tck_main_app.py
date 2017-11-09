@@ -1,4 +1,5 @@
-from tkinter import ttk, messagebox, filedialog, N, S, E, W, HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, Text
+from tkinter import ttk, messagebox, filedialog, N, S, E, W, \
+    HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, Text, Entry, StringVar
 import os
 from datetime import date
 
@@ -40,6 +41,7 @@ class App(ttk.Frame):
 
         self.current_axis = self._create_axis("A", mock_connection)
 
+        self.terminal_input = StringVar()
         self.create_widgets()
 
         self.axes[self.current_axis.axis_letter] = self.current_axis
@@ -94,24 +96,37 @@ class App(ttk.Frame):
         except Exception as e:
             self.log("File failed to save: {}".format(e.message))
 
+    def send_command(self, *args):
+        self.log(self.g.GCommand(self.terminal_input.get()))
+        self.terminal_input.set("")
+
     def create_widgets(self):
+        """
+        Creates all the graphical elements on the screen.
+        """
         overall = ttk.Panedwindow(self, orient=HORIZONTAL)
-        overall.pack(fill=BOTH, expand=1)
+        overall.pack(fill=BOTH, expand=True)
 
         rhs = ttk.Panedwindow(self, orient=VERTICAL)
+        rhs.pack(fill=BOTH, expand=True)
 
-        notebook = ttk.Notebook(rhs)
+        notebook = ttk.Notebook(rhs, height=440)
 
         self.mot_details = MotorSettings(self.current_axis, notebook, self.change_axis)
-        self.mot_details.pack(fill=BOTH, expand=1)
+        self.mot_details.pack(fill=BOTH, expand=True)
         notebook.add(self.mot_details, text="Motor Settings")
 
         test_settings = ttk.Frame(notebook)
         notebook.add(test_settings, text="Test Settings")
+
         rhs.add(notebook)
 
-        self.out_log = Text(rhs, state=DISABLED)
+        self.out_log = Text(rhs, state=DISABLED, height=18)
         rhs.add(self.out_log)
+
+        terminal = Entry(rhs, state=NORMAL, textvariable=self.terminal_input)
+        terminal.bind('<Return>', self.send_command)
+        rhs.add(terminal)
 
         self.buttons = TestButtonBar(self.current_axis, test_settings, self)
 
