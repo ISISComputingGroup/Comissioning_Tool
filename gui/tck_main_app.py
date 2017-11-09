@@ -8,11 +8,13 @@ from gui.motor_details import MotorSettings
 from gui.statistics import Statistics
 from mocks.mock_axis import MockAxis
 from axis import LoggingAxis
-from comms.comms import create_connection, open_connection
+from comms.comms import create_connection
 
 
 class App(ttk.Frame):
-    connection_open = True
+    """
+    The main window for the app.
+    """
     axes = dict()
 
     def __init__(self, mock_connection=False, master=None):
@@ -26,7 +28,7 @@ class App(ttk.Frame):
 
         try:
             self.g = create_connection(mock_connection, self.log)
-        except Exception as e:
+        except IOError as e:
             # TODO: retry?
             msg = "Cannot connect to Galil."
             msg += "\nEnsure that: "
@@ -64,16 +66,6 @@ class App(ttk.Frame):
         self.g.GClose()
         self.master.destroy()
 
-    def toggle_connection(self):
-        if self.connection_open:
-            self.log("Closing connection")
-            self.g.GClose()
-        else:
-            self.log("Opening new connection")
-            open_connection(self.g)
-
-        self.connection_open = not self.connection_open
-
     def change_axis(self, new_axis):
         self.log("Changing to axis {}".format(new_axis))
         self.current_axis.stop()
@@ -89,18 +81,16 @@ class App(ttk.Frame):
 
     def save_all(self):
         try:
-            fname = filedialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
+            filename = filedialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
 
-            out = "Test performed on {}\n".format(date.today().strftime("%d/%m/%y"))
-            for axis in self.axes.values():
-                out += "\n"
-                out += str(axis)
-                out += "\n"
+            if filename != '':
+                out = "Test performed on {}\n".format(date.today().strftime("%d/%m/%y"))
+                [out.__add__("\n{}\n".format(axis)) for axis in self.axes.values()]
 
-            with open(fname, mode="w") as f:
-                f.write(out)
+                with open(filename, mode="w") as f:
+                    f.write(out)
 
-            self.log("File saved")
+                self.log("File saved")
         except Exception as e:
             self.log("File failed to save: {}".format(e.message))
 

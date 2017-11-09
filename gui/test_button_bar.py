@@ -1,5 +1,5 @@
 from tkinter import ttk, messagebox, NORMAL, DISABLED, X, BOTH, Button
-from comms.comms import stop_all
+from comms.comms import stop_all, open_connection
 from threading import Thread
 from motor_tests.dir_test import DirectionTest
 from motor_tests.encoder_test import EncoderTest
@@ -10,6 +10,7 @@ from motor_tests.back_lash_test import BacklashTest
 class TestButtonBar(ttk.Frame):
     button_idx = 0
     test_buttons = []
+    connection_open = True
 
     def __init__(self, axis, settings_panel, parent):
         ttk.Frame.__init__(self, parent)
@@ -28,11 +29,9 @@ class TestButtonBar(ttk.Frame):
 
     def enable_buttons(self):
         if self.axis.limits_found.get():
-            for t in self.test_buttons:
-                t.configure(state=NORMAL)
+            [t.configure(state=NORMAL) for t in self.test_buttons]
         else:
-            for t in self.test_buttons:
-                t.configure(state=DISABLED)
+            [t.configure(state=DISABLED) for t in self.test_buttons]
 
             self.test_buttons[0].configure(state=NORMAL)
 
@@ -74,18 +73,22 @@ class TestButtonBar(ttk.Frame):
         test.running.trace("w", lambda *args: self.events.put(self.enable_buttons))
 
     def toggle_connection(self):
-        if self.parent.connection_open:
+        if self.connection_open:
+            self.log("Closing connection")
             for t in self.test_buttons:
                 t.configure(state=DISABLED)
             self.stop_button.configure(state=DISABLED)
             new_text = "Reconnect"
+            self.g.GClose()
         else:
+            self.log("Opening new connection")
             self.stop_button.configure(state=NORMAL)
             self.test_buttons[0].configure(state=NORMAL)
             new_text = "Disconnect"
+            open_connection(self.g)
 
         self.disconnect_button.configure(text=new_text)
-        self.parent.toggle_connection()
+        self.connection_open = not self.connection_open
 
     def create_widgets(self):
         self._create_test_button(DirectionTest, NORMAL)

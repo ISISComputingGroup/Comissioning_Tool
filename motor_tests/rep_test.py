@@ -1,14 +1,14 @@
 import numpy as np
 from tkinter import IntVar, ttk
 
-from motor_tests.motor_test import MotorTest
+from motor_tests.generic_test import MotorTest
 
 
 class RepeatabilityTest(MotorTest):
     name = "Repeatability Test"
 
     def __init__(self, event_queue, logger, axis, g):
-        MotorTest.__init__(self, axis, event_queue, logger)
+        super().__init__(axis, event_queue, logger)
         self.steps = IntVar(value=1000)
         self.repeats = IntVar(value=5)
 
@@ -34,10 +34,10 @@ class RepeatabilityTest(MotorTest):
 
         d = np.array([begin[0], begin[1], end[0], end[1]])
 
-        fname = "data.txt"
-        np.savetxt(fname, d, fmt="%d", delimiter=",")
+        filename = "data.txt"
+        np.savetxt(filename, d, fmt="%d", delimiter=",")
 
-        self.log("Saving in {}".format(fname))
+        self.log("Saving in {}".format(filename))
 
     def get_settings_ui(self, frame):
         ttk.Label(frame, text="Move").grid(column=0, row=0)

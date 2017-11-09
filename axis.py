@@ -73,7 +73,6 @@ class Axis:
         to_send = format_command(command, self.axis_letter, *parameters)
         return self.g.GCommand(to_send)
 
-
     def jog(self, forwards=True):
         """
         Jogs the axis (forwards if not specified)
@@ -206,15 +205,18 @@ class Axis:
         self.g.GMotionComplete(self.axis_letter)
 
     def __str__(self):
-        str = "For axis: {}\n".format(self.axis_letter)
-        str += "Motor Type: {}\nEncoder Type: {}\n".format(self.motor_type.get(), self.encoder_type.get())
-        str += "Motor Resolution (microns per full step): {}\n".format(self.motor_res.get())
-        str += "Encoder Resolution (counts per micron): {}\n".format(self.enc_res.get())
-        str += "Microsteps: {}\n".format(self.microstep.get())
-        str += "Last tested speed: {}\n".format(self.JOG_SPEED.get())
+        """
+        :return: What is printed to file when this axis is saved.
+        """
+        out = "For axis: {}\n".format(self.axis_letter)
+        out += "Motor Type: {}\nEncoder Type: {}\n".format(self.motor_type.get(), self.encoder_type.get())
+        out += "Motor Resolution (microns per full step): {}\n".format(self.motor_res.get())
+        out += "Encoder Resolution (counts per micron): {}\n".format(self.enc_res.get())
+        out += "Microsteps: {}\n".format(self.microstep.get())
+        out += "Last tested speed: {}\n".format(self.JOG_SPEED.get())
         if self.limits_found.get():
-            str += "Distance between limits (steps): {}\n".format(self.high_limit-self.low_limit)
-        return str
+            out += "Distance between limits (steps): {}\n".format(self.high_limit-self.low_limit)
+        return out
 
 
 class LoggingAxis(Axis):
@@ -222,7 +224,7 @@ class LoggingAxis(Axis):
     An axis that also logs every command that it sends to the controller.
     """
     def __init__(self, g, axis_letter="A", old_axis=None):
-        Axis.__init__(self, g, axis_letter, old_axis)
+        super().__init__(g, axis_letter, old_axis)
 
     def download_program_and_execute(self, program):
         prog_name = "name"
