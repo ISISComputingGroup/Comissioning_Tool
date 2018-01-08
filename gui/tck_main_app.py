@@ -1,7 +1,6 @@
 from tkinter import ttk, messagebox, filedialog, N, S, E, W, \
     HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, Text, Entry, StringVar
 import os
-from datetime import date
 
 from gui.test_button_bar import TestButtonBar
 from gui.event_handler import EventHandler
@@ -10,6 +9,9 @@ from gui.statistics import Statistics
 from mocks.mock_axis import MockAxis
 from axis import LoggingAxis
 from comms.comms import create_connection
+from file_writer import save_axes, load_axes
+
+available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
 
 
 class App(ttk.Frame):
@@ -20,7 +22,6 @@ class App(ttk.Frame):
 
     def __init__(self, mock_connection=False, master=None):
         ttk.Frame.__init__(self, master, padding="5")
-        self.mock = mock_connection
         self.master = master
 
         self.grid(column=0, row=0, sticky=N+S+E+W)
@@ -39,20 +40,16 @@ class App(ttk.Frame):
             messagebox.showerror("Cannot Connect", msg)
             self.quit()
 
-        self.current_axis = self._create_axis("A", mock_connection)
+        self.axes = {letter: self._create_axis(letter, mock_connection) for letter in available_axes}
+        self.current_axis = self.axes["A"]
 
         self.terminal_input = StringVar()
         self.create_widgets()
 
-        self.axes[self.current_axis.axis_letter] = self.current_axis
-
         self.current_axis.setup()
 
-    def _create_axis(self, letter, mock=False, old_axis=None):
-        if mock:
-            return MockAxis(self.g, letter, old_axis)
-        else:
-            return LoggingAxis(self.g, letter, old_axis)
+    def _create_axis(self, letter, mock=False):
+        return MockAxis(self.g, letter) if mock else LoggingAxis(self.g, letter)
 
     def _log(self, message):
         self.out_log.configure(state=NORMAL)
@@ -74,27 +71,33 @@ class App(ttk.Frame):
         if new_axis in self.axes:
             self.current_axis = self.axes[new_axis]
         else:
-            self.current_axis = self._create_axis(new_axis, self.mock, self.current_axis)
-            self.axes[new_axis] = self.current_axis
+            self.log("Unknown axis")
         self.current_axis.setup()
         self.mot_details.bind_axis(self.current_axis)
         self.buttons.change_axis(self.current_axis)
         self.stats.change_axis(self.current_axis)
 
-    def save_all(self):
+    def save_setup(self):
         try:
             filename = filedialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
 
             if filename != '':
-                out = "Test performed on {}\n".format(date.today().strftime("%d/%m/%y"))
-                [out.__add__("\n{}\n".format(axis)) for axis in self.axes.values()]
-
-                with open(filename, mode="w") as f:
-                    f.write(out)
+                save_axes(filename, self.axes)
 
                 self.log("File saved")
         except Exception as e:
             self.log("File failed to save: {}".format(e.message))
+
+    def load_setup(self):
+        try:
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
+
+            if filename != '':
+                load_axes()
+
+                self.log("File loaded")
+        except Exception as e:
+            self.log("File failed to load: {}".format(e.message))
 
     def send_command(self, *args):
         self.log(self.g.GCommand(self.terminal_input.get()))
@@ -112,7 +115,7 @@ class App(ttk.Frame):
 
         notebook = ttk.Notebook(rhs, height=440)
 
-        self.mot_details = MotorSettings(self.current_axis, notebook, self.change_axis)
+        self.mot_details = MotorSettings(self.current_axis, notebook, self.change_axis, available_axes)
         self.mot_details.pack(fill=BOTH, expand=True)
         notebook.add(self.mot_details, text="Motor Settings")
 

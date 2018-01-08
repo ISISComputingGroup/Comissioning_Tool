@@ -10,8 +10,8 @@ class MockAxis(Axis):
     actual_high_lim = 10000
     actual_low_lim = -10000
 
-    def __init__(self, g, axis_letter="A", old_axis=None):
-        Axis.__init__(self, g, axis_letter, old_axis)
+    def __init__(self, g, axis_letter="A"):
+        Axis.__init__(self, g, axis_letter)
         if axis_letter == "B":
             self.actual_high_lim *= 2
             self.actual_low_lim *= 2
