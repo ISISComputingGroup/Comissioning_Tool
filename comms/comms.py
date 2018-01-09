@@ -136,12 +136,11 @@ def create_connection(mock=False, log=None):
     :param log: The log to print any mock messages.
     :return: An instance of the galil connection object
     """
-    if mock:
-        g = MockGalil(log)
-    else:
-        g = gclib.py()
+    g = MockGalil(log) if mock else gclib.py()
 
     if not open_connection(g):
         raise IOError("Error, cannot communicate with galil")
+
+    g.GCommand(CONFIGURE)
 
     return g

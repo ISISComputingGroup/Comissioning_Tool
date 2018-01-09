@@ -10,7 +10,7 @@ class MotorSettings(ttk.Frame):
     # Bound controls stored as control: attribute
     axis_bound_controls = dict()
 
-    def __init__(self, axis, parent, par_change_axis):
+    def __init__(self, axis, parent, func_change_axis, available_axes):
         ttk.Frame.__init__(self, parent, padding="10")
         self.axis = axis
 
@@ -23,17 +23,16 @@ class MotorSettings(ttk.Frame):
         self.calc_pos = StringVar(value="0.0")
         self.calc_pos.trace("w", lambda *args: self.do_calculation(pos=self.calc_pos.get()))
 
-        self.create_widgets()
+        self.func_change_axis = func_change_axis
+
+        self.create_widgets(available_axes)
         self.bind_axis(axis)
 
-        self.chosen_axis.trace("w", lambda *args: par_change_axis(self.chosen_axis.get()))
-
     def do_calculation(self, **vals):
-        for k, v in vals.iteritems():
-            try:
-                vals[k] = float(v)
-            except:
-                return
+        try:
+            vals = {_: float(v) for _, v in vals.items()}
+        except ValueError:
+            return
 
         if "enc_cnts" in vals:
             stps_per_cnt = self.axis.microstep.get()/(self.axis.motor_res.get()*self.axis.enc_res.get())
@@ -74,12 +73,11 @@ class MotorSettings(ttk.Frame):
         self.axis_bound_controls[e] = attr
         return e
 
-    def create_widgets(self):
-        available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
-
+    def create_widgets(self, available_axes):
         ttk.Style().configure("head.TMenubutton", font="Times 20")
         ttk.Label(self, text="Axis under test: ", font="Times 20").grid(column=0, row=0, columnspan=2, pady="10", sticky=E)
-        axes = ttk.OptionMenu(self, self.chosen_axis, self.axis.axis_letter, *available_axes, style="head.TMenubutton")
+        axes = ttk.OptionMenu(self, self.chosen_axis, self.axis.axis_letter, *available_axes, style="head.TMenubutton",
+                              command=lambda *args: self.func_change_axis(self.chosen_axis.get()))
         axes.grid(column=2, row=0, sticky=W)
 
         ttk.Label(self, text="Speed (steps/s): ").grid(column=0, row=1)

@@ -108,6 +108,8 @@ class DirectionTest(MotorTest):
         Tests the directionality of the axis.
         """
 
+        self.axis.remove_limits()
+
         if not self.event_queue.put_and_get(self._limits_connected):
             raise Exception("Cannot continue until limits are connected.")
 

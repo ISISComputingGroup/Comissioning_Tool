@@ -3,6 +3,8 @@ from tkinter import IntVar, BooleanVar, DoubleVar
 from comms.consts import *
 from comms.comms import format_command, translate_TS
 
+from file_writer import convert_axis_to_dict
+
 
 class Axis:
     """
@@ -18,7 +20,7 @@ class Axis:
     STOP_LIM_PROG_NAME = "LIM"
     MAX_SOFT_LIM = 2147483647
 
-    def __init__(self, g, axis_letter="A", old_axis=None):
+    def __init__(self, g, axis_letter="A"):
         self.g = g
         self.axis_letter = axis_letter
 
@@ -34,26 +36,19 @@ class Axis:
         self.offset = IntVar()  # The offset of the soft limits
         self.limits_found = BooleanVar(value=False)
 
-        if old_axis is not None and isinstance(old_axis, Axis):
-            self.JOG_SPEED.set(old_axis.JOG_SPEED.get())
-            self.microstep.set(old_axis.microstep.get())
-            self.motor_res.set(old_axis.motor_res.get())
-            self.enc_res.set(old_axis.enc_res.get())
-        else:
-            self.JOG_SPEED.set(3000)
+        self.JOG_SPEED.set(3000)
 
-            self.microstep.set(16)
-            self.motor_res.set(1.0)  # Microns per full step
-            self.enc_res.set(2.5)  # Counts per micron
+        self.microstep.set(16)
+        self.motor_res.set(1.0)  # Microns per full step
+        self.enc_res.set(2.5)  # Counts per micron
 
-    def setup(self):
-        """
-        Sets up the motor on first start up.
-        """
-        self.stop()
-        self.send(CONFIGURE)
         self.motor_type.set(float(self.send(MOTOR_TYPE, "?")))
         self.encoder_type.set(int(self.send(CONFIGURE_ENCODER, "?")))
+
+    def remove_limits(self):
+        """
+        Removes the soft limits from the controller.
+        """
         self.send(FORWARD_LIMIT, self.MAX_SOFT_LIM)
         self.send(BACK_LIMIT, -self.MAX_SOFT_LIM)
 
@@ -208,15 +203,7 @@ class Axis:
         """
         :return: What is printed to file when this axis is saved.
         """
-        out = "For axis: {}\n".format(self.axis_letter)
-        out += "Motor Type: {}\nEncoder Type: {}\n".format(self.motor_type.get(), self.encoder_type.get())
-        out += "Motor Resolution (microns per full step): {}\n".format(self.motor_res.get())
-        out += "Encoder Resolution (counts per micron): {}\n".format(self.enc_res.get())
-        out += "Microsteps: {}\n".format(self.microstep.get())
-        out += "Last tested speed: {}\n".format(self.JOG_SPEED.get())
-        if self.limits_found.get():
-            out += "Distance between limits (steps): {}\n".format(self.high_limit-self.low_limit)
-        return out
+        return str(convert_axis_to_dict(self))
 
 
 class LoggingAxis(Axis):
