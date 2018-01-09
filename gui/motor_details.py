@@ -31,7 +31,7 @@ class MotorSettings(ttk.Frame):
     def do_calculation(self, **vals):
         try:
             vals = {_: float(v) for _, v in vals.items()}
-        except:
+        except ValueError:
             return
 
         if "enc_cnts" in vals:

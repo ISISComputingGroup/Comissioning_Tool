@@ -1,7 +1,5 @@
-from tkinter import ttk, messagebox, filedialog, N, S, E, W, \
-    HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, Text, Entry, StringVar
-import os
-
+from tkinter import ttk, messagebox, N, S, E, W, HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, \
+    Text, Entry, StringVar
 from gui.test_button_bar import TestButtonBar
 from gui.event_handler import EventHandler
 from gui.motor_details import MotorSettings
@@ -9,7 +7,7 @@ from gui.statistics import Statistics
 from mocks.mock_axis import MockAxis
 from axis import LoggingAxis
 from comms.comms import create_connection
-from file_writer import save_axes, load_axes
+from file_writer import save_load_axes
 
 available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
 
@@ -78,26 +76,10 @@ class App(ttk.Frame):
         self.stats.change_axis(self.current_axis)
 
     def save_setup(self):
-        try:
-            filename = filedialog.asksaveasfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
-
-            if filename != '':
-                save_axes(filename, self.axes)
-
-                self.log("File saved")
-        except Exception as e:
-            self.log("File failed to save: {}".format(e.message))
+        save_load_axes(True, self.axes, self.log)
 
     def load_setup(self):
-        try:
-            filename = filedialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")])
-
-            if filename != '':
-                load_axes()
-
-                self.log("File loaded")
-        except Exception as e:
-            self.log("File failed to load: {}".format(e.message))
+        save_load_axes(False, self.axes, self.log)
 
     def send_command(self, *args):
         self.log(self.g.GCommand(self.terminal_input.get()))
