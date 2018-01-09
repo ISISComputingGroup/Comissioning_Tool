@@ -141,4 +141,6 @@ def create_connection(mock=False, log=None):
     if not open_connection(g):
         raise IOError("Error, cannot communicate with galil")
 
+    g.GCommand(CONFIGURE)
+
     return g

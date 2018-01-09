@@ -42,14 +42,13 @@ class Axis:
         self.motor_res.set(1.0)  # Microns per full step
         self.enc_res.set(2.5)  # Counts per micron
 
-    def setup(self):
-        """
-        Sets up the motor on first start up.
-        """
-        self.stop()
-        self.send(CONFIGURE)
         self.motor_type.set(float(self.send(MOTOR_TYPE, "?")))
         self.encoder_type.set(int(self.send(CONFIGURE_ENCODER, "?")))
+
+    def remove_limits(self):
+        """
+        Removes the soft limits from the controller.
+        """
         self.send(FORWARD_LIMIT, self.MAX_SOFT_LIM)
         self.send(BACK_LIMIT, -self.MAX_SOFT_LIM)
 

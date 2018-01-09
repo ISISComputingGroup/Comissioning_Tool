@@ -28,12 +28,10 @@ class MockAxis(Axis):
         Axis.send(self, command, *parameters)
         if command is TELL_SWITCHES:
             return self._mock_switches()
-
-    def setup(self):
-        self.stop()
-        self.send(CONFIGURE)
-        self.motor_type.set(2.5)
-        self.encoder_type.set(14)
+        if command is MOTOR_TYPE:
+            return 2.5
+        if command is CONFIGURE_ENCODER:
+            return 14
 
     def jog(self, forwards=True):
         Axis.jog(self, forwards)

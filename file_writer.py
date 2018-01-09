@@ -107,5 +107,8 @@ def convert_dict_to_axis(axis, axis_data_dict):
     if LOW_LIMIT_STR in axis_data_dict:
         axis.low_limit = axis_data_dict[LOW_LIMIT_STR]
         axis.high_limit = axis_data_dict[HIGH_LIMIT_STR]
-        axis.offset.set(axis_data_dict[SOFT_LIM_OFF_STR])
         axis.limits_found.set(True)
+
+    if SOFT_LIM_OFF_STR in axis_data_dict:
+        axis.offset.set(axis_data_dict[SOFT_LIM_OFF_STR])
+        axis.set_soft_limits()

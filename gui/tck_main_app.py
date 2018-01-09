@@ -44,8 +44,6 @@ class App(ttk.Frame):
         self.terminal_input = StringVar()
         self.create_widgets()
 
-        self.current_axis.setup()
-
     def _create_axis(self, letter, mock=False):
         return MockAxis(self.g, letter) if mock else LoggingAxis(self.g, letter)
 
@@ -70,7 +68,6 @@ class App(ttk.Frame):
             self.current_axis = self.axes[new_axis]
         else:
             self.log("Unknown axis")
-        self.current_axis.setup()
         self.mot_details.bind_axis(self.current_axis)
         self.buttons.change_axis(self.current_axis)
         self.stats.change_axis(self.current_axis)
