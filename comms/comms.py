@@ -3,7 +3,7 @@ import math
 import serial.tools.list_ports
 from mocks.mock_galil import MockGalil
 from comms.consts import *
-import gclib
+from gclib import gclib
 
 
 def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
