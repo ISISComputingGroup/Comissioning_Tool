@@ -1,8 +1,7 @@
-from datetime import date
 import json
-from tkinter import filedialog
 import os
-
+from datetime import date
+from tkinter import filedialog
 
 MTR_TYPE_STR = "Motor Type"
 ENC_TYPE_STR = "Encoder Type"

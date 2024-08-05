@@ -1,5 +1,5 @@
-from comms.comms import *
 from axis import Axis
+from comms.comms import *
 
 
 class MockAxis(Axis):

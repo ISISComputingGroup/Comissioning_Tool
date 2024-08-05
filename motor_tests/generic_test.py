@@ -1,5 +1,5 @@
-from tkinter import messagebox, BooleanVar
 from functools import partial
+from tkinter import BooleanVar, messagebox
 
 
 class MotorTest:

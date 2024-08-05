@@ -1,4 +1,5 @@
 import tkinter
+
 from gui.tck_main_app import App
 
 WIDTH = 1000

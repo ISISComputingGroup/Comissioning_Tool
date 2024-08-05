@@ -1,10 +1,11 @@
-from tkinter import ttk, messagebox, NORMAL, DISABLED, X, BOTH, Button
-from comms.comms import stop_all, open_connection
 from threading import Thread
+from tkinter import BOTH, DISABLED, NORMAL, Button, X, messagebox, ttk
+
+from comms.comms import open_connection, stop_all
+from motor_tests.back_lash_test import BacklashTest
 from motor_tests.dir_test import DirectionTest
 from motor_tests.encoder_test import EncoderTest
 from motor_tests.rep_test import RepeatabilityTest
-from motor_tests.back_lash_test import BacklashTest
 
 
 class TestButtonBar(ttk.Frame):

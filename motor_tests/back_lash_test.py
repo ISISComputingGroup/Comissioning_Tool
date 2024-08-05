@@ -1,7 +1,7 @@
 from random import randint
+from tkinter import IntVar, ttk
 
 import numpy as np
-from tkinter import IntVar, ttk
 
 from comms.comms import start_recording
 from comms.consts import STOP_REC

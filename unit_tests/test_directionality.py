@@ -1,6 +1,8 @@
 import unittest
-from motor_tests.dir_test import DirectionTest
+
 from mock import patch
+
+from motor_tests.dir_test import DirectionTest
 
 
 class MockAxis():

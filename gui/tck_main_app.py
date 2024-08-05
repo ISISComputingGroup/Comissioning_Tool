@@ -1,13 +1,29 @@
-from tkinter import ttk, messagebox, N, S, E, W, HORIZONTAL, VERTICAL, BOTH, DISABLED, NORMAL, END, \
-    Text, Entry, StringVar
-from gui.test_button_bar import TestButtonBar
-from gui.event_handler import EventHandler
-from gui.motor_details import MotorSettings
-from gui.statistics import Statistics
-from mocks.mock_axis import MockAxis
+from tkinter import (
+    BOTH,
+    DISABLED,
+    END,
+    HORIZONTAL,
+    NORMAL,
+    VERTICAL,
+    E,
+    Entry,
+    N,
+    S,
+    StringVar,
+    Text,
+    W,
+    messagebox,
+    ttk,
+)
+
 from axis import LoggingAxis
 from comms.comms import create_connection
 from file_writer import save_load_axes
+from gui.event_handler import EventHandler
+from gui.motor_details import MotorSettings
+from gui.statistics import Statistics
+from gui.test_button_bar import TestButtonBar
+from mocks.mock_axis import MockAxis
 
 available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
 
@@ -28,7 +44,7 @@ class App(ttk.Frame):
 
         try:
             self.g = create_connection(mock_connection, self.log)
-        except IOError as e:
+        except IOError:
             # TODO: retry?
             msg = "Cannot connect to Galil."
             msg += "\nEnsure that: "

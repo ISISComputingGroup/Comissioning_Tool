@@ -1,4 +1,4 @@
-from tkinter import StringVar, ttk, messagebox, E, W, DISABLED, NORMAL
+from tkinter import DISABLED, NORMAL, E, StringVar, W, messagebox, ttk
 
 lim_repr = lambda lim: "Unknown" if lim is None else lim
 

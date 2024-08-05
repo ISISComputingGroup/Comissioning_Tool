@@ -1,8 +1,7 @@
-from tkinter import IntVar, BooleanVar, DoubleVar
+from tkinter import BooleanVar, DoubleVar, IntVar
 
-from comms.consts import *
 from comms.comms import format_command, translate_TS
-
+from comms.consts import *
 from file_writer import convert_axis_to_dict
 
 

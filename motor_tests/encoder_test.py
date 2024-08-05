@@ -1,6 +1,7 @@
 import time
+from tkinter import E, StringVar, W, messagebox, ttk
+
 import numpy as np
-from tkinter import StringVar, W, E, ttk, messagebox
 
 from comms.comms import start_recording
 from motor_tests.generic_test import MotorTest

@@ -1,15 +1,16 @@
-import numpy as np
-from random import random
-from scipy import interpolate
 import os
+from random import random
 
 import matplotlib
+import numpy as np
+from scipy import interpolate
+
 matplotlib.use('TkAgg')
+
+from tkinter import BOTH, BOTTOM, LEFT, TOP, BooleanVar, Toplevel, Y, filedialog, ttk
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
-
-from tkinter import ttk, BooleanVar, Toplevel, filedialog, TOP, BOTTOM, BOTH, LEFT, Y
 
 
 class Statistics(ttk.Frame):
