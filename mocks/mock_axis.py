@@ -3,7 +3,6 @@ from comms.comms import *
 
 
 class MockAxis(Axis):
-
     current_pos = 0
     current_steps = 0
 

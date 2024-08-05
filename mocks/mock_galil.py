@@ -2,7 +2,7 @@ import random
 import time
 
 
-class MockGalil():
+class MockGalil:
     arr_num = 0
 
     def __init__(self, log):
@@ -34,8 +34,8 @@ class MockGalil():
 
         out = []
         for i in range(start, end):
-            start = self.arr_num*10
-            out.append(random.randint(start, start+10))
+            start = self.arr_num * 10
+            out.append(random.randint(start, start + 10))
         self.log("Uploading array: {}".format(out[0:5]))
         self.arr_num += 1
         return out

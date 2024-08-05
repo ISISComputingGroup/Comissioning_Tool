@@ -5,7 +5,7 @@ from mock import patch
 from motor_tests.dir_test import DirectionTest
 
 
-class MockAxis():
+class MockAxis:
     motor_type = 2.0
     forward_hit = False
     backward_hit = False
@@ -14,7 +14,7 @@ class MockAxis():
         return {"Forward Limit": self.forward_hit, "Back Limit": self.backward_hit}
 
 
-class MockEventQueue():
+class MockEventQueue:
     def put(self, *args):
         pass
 
@@ -33,7 +33,9 @@ class Test(unittest.TestCase):
         with self.assertRaises(Exception):
             self.dir._is_direction_correct(0, 0)
 
-    def test_GIVEN_motor_going_forward_and_actually_forward_WHEN_direction_calculated_THEN_correct(self):
+    def test_GIVEN_motor_going_forward_and_actually_forward_WHEN_direction_calculated_THEN_correct(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = True
 
@@ -43,7 +45,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertTrue(correct)
 
-    def test_GIVEN_motor_going_forward_and_not_actually_forward_WHEN_direction_calculated_THEN_incorrect(self):
+    def test_GIVEN_motor_going_forward_and_not_actually_forward_WHEN_direction_calculated_THEN_incorrect(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = False
 
@@ -53,7 +57,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertFalse(correct)
 
-    def test_GIVEN_motor_not_going_forward_and_actually_forward_WHEN_direction_calculated_THEN_incorrect(self):
+    def test_GIVEN_motor_not_going_forward_and_actually_forward_WHEN_direction_calculated_THEN_incorrect(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = True
 
@@ -63,7 +69,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertFalse(correct)
 
-    def test_GIVEN_motor_not_going_forward_and_not_actually_forward_WHEN_direction_calculated_THEN_correct(self):
+    def test_GIVEN_motor_not_going_forward_and_not_actually_forward_WHEN_direction_calculated_THEN_correct(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = False
 
@@ -91,7 +99,9 @@ class Test(unittest.TestCase):
         with self.assertRaises(Exception):
             self.dir._are_switches_correct()
 
-    def test_GIVEN_actually_forward_and_forward_limit_hit_WHEN_switches_calculated_THEN_correct(self):
+    def test_GIVEN_actually_forward_and_forward_limit_hit_WHEN_switches_calculated_THEN_correct(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = True
         self.axis.forward_hit = True
@@ -102,7 +112,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertTrue(correct)
 
-    def test_GIVEN_actually_forward_and_backward_limit_hit_WHEN_switches_calculated_THEN_incorrect(self):
+    def test_GIVEN_actually_forward_and_backward_limit_hit_WHEN_switches_calculated_THEN_incorrect(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = True
         self.axis.backward_hit = True
@@ -113,7 +125,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertFalse(correct)
 
-    def test_GIVEN_not_actually_forward_and_backward_limit_hit_WHEN_switches_calculated_THEN_correct(self):
+    def test_GIVEN_not_actually_forward_and_backward_limit_hit_WHEN_switches_calculated_THEN_correct(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = False
         self.axis.backward_hit = True
@@ -124,7 +138,9 @@ class Test(unittest.TestCase):
         # Assert
         self.assertTrue(correct)
 
-    def test_GIVEN_not_actually_forward_and_forward_limit_hit_WHEN_switches_calculated_THEN_incorrect(self):
+    def test_GIVEN_not_actually_forward_and_forward_limit_hit_WHEN_switches_calculated_THEN_incorrect(
+        self,
+    ):
         # Arrange
         self.dir.actually_forward = False
         self.axis.forward_hit = True
@@ -141,10 +157,14 @@ class Test(unittest.TestCase):
     def test_GIVEN_motor_type_2_and_half_WHEN_reverse_calculated_THEN_new_motor_type_is_2(self):
         self.assertEqual(2.0, self.dir._calc_reverse_motor(2.5))
 
-    def test_GIVEN_motor_type_minus_2_WHEN_reverse_calculated_THEN_new_motor_type_is_minus_2_and_half(self):
+    def test_GIVEN_motor_type_minus_2_WHEN_reverse_calculated_THEN_new_motor_type_is_minus_2_and_half(
+        self,
+    ):
         self.assertEqual(-2.0, self.dir._calc_reverse_motor(-2.5))
 
-    def test_GIVEN_motor_type_minus_2_and_half_WHEN_reverse_calculated_THEN_new_motor_type_is_minus_2(self):
+    def test_GIVEN_motor_type_minus_2_and_half_WHEN_reverse_calculated_THEN_new_motor_type_is_minus_2(
+        self,
+    ):
         self.assertEqual(-2.5, self.dir._calc_reverse_motor(-2.0))
 
     def test_GIVEN_unrecognized_motor_type_WHEN_reverse_calculated_THEN_error_raised(self):
@@ -154,8 +174,12 @@ class Test(unittest.TestCase):
     def test_GIVEN_enc_type_13_and_motor_type_2_WHEN_reverse_calculated_THEN_new_enc_type_7(self):
         self.assertEqual(7, self.dir._calc_reverse_encoder(13, 2))
 
-    def test_GIVEN_enc_type_6_and_motor_type_two_and_a_half_WHEN_reverse_calculated_THEN_new_enc_type_12(self):
+    def test_GIVEN_enc_type_6_and_motor_type_two_and_a_half_WHEN_reverse_calculated_THEN_new_enc_type_12(
+        self,
+    ):
         self.assertEqual(12, self.dir._calc_reverse_encoder(6, 2.5))
 
-    def test_GIVEN_enc_type_3_and_motor_type_two_and_a_half_WHEN_reverse_calculated_THEN_new_enc_type_13(self):
+    def test_GIVEN_enc_type_3_and_motor_type_two_and_a_half_WHEN_reverse_calculated_THEN_new_enc_type_13(
+        self,
+    ):
         self.assertEqual(13, self.dir._calc_reverse_encoder(3, 2.5))

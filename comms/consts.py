@@ -1,7 +1,7 @@
 START_AXIS = "SH$ax"
 JOG = "JG$ax=$par0"
 BEGIN = "BG$ax"
-MESSAGE = "MG \"Axis $ax says $par0\" {P1}"
+MESSAGE = 'MG "Axis $ax says $par0" {P1}'
 STOP = "ST$ax"
 MOTOR_OFF = "MO$ax"
 TELL_POSITION = "TP$ax"

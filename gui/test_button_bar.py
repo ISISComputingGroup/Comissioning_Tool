@@ -102,14 +102,18 @@ class TestButtonBar(ttk.Frame):
 
         self.axis.limits_found.trace("w", lambda *args: self.events.put(self.enable_buttons))
 
-        self.stop_button = Button(self, text="STOP MOTORS", command=self.manual_stop, bg='#FF0000')
+        self.stop_button = Button(self, text="STOP MOTORS", command=self.manual_stop, bg="#FF0000")
         self._place_button(self.stop_button)
 
         self.disconnect_button = ttk.Button(self, text="Disconnect", command=self.toggle_connection)
         self._place_button(self.disconnect_button)
 
-        self._place_button(ttk.Button(self, text="Save All Axes Setup", command=self.parent.save_setup))
+        self._place_button(
+            ttk.Button(self, text="Save All Axes Setup", command=self.parent.save_setup)
+        )
 
-        self._place_button(ttk.Button(self, text="Load All Axes Setup", command=self.parent.load_setup))
+        self._place_button(
+            ttk.Button(self, text="Load All Axes Setup", command=self.parent.load_setup)
+        )
 
         self._place_button(ttk.Button(self, text="Exit", command=self.parent.quit))

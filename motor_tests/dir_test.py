@@ -77,7 +77,9 @@ class DirectionTest(MotorTest):
             else:
                 raise Exception("Error: tried to run to limit but failed")
 
-        correct = (self.actually_forward and forward_hit) or (not self.actually_forward and backward_hit)
+        correct = (self.actually_forward and forward_hit) or (
+            not self.actually_forward and backward_hit
+        )
 
         if correct:
             if self.actually_forward:
@@ -137,7 +139,9 @@ class DirectionTest(MotorTest):
 
         encoder_correct = self._log_dir_correct("Encoder", start_pos, self.axis.get_position())
         if not encoder_correct:
-            new_encoder_type = self._calc_reverse_encoder(self.axis.encoder_type.get(), self.axis.motor_type.get())
+            new_encoder_type = self._calc_reverse_encoder(
+                self.axis.encoder_type.get(), self.axis.motor_type.get()
+            )
         else:
             new_encoder_type = self.axis.encoder_type.get()
         self.log("CE should be: {}".format(new_encoder_type))
@@ -166,5 +170,3 @@ class DirectionTest(MotorTest):
 
         self.log("Axis forward limit at: " + str(self.axis.high_limit))
         self.log("Axis back limit at: " + str(self.axis.low_limit))
-
-

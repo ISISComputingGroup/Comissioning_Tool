@@ -25,20 +25,21 @@ from gui.statistics import Statistics
 from gui.test_button_bar import TestButtonBar
 from mocks.mock_axis import MockAxis
 
-available_axes = list(map(chr, range(ord('A'), ord('H')+1)))
+available_axes = list(map(chr, range(ord("A"), ord("H") + 1)))
 
 
 class App(ttk.Frame):
     """
     The main window for the app.
     """
+
     axes = dict()
 
     def __init__(self, mock_connection=False, master=None):
         ttk.Frame.__init__(self, master, padding="5")
         self.master = master
 
-        self.grid(column=0, row=0, sticky=N+S+E+W)
+        self.grid(column=0, row=0, sticky=N + S + E + W)
 
         self.events = EventHandler(master)
 
@@ -54,7 +55,9 @@ class App(ttk.Frame):
             messagebox.showerror("Cannot Connect", msg)
             self.quit()
 
-        self.axes = {letter: self._create_axis(letter, mock_connection) for letter in available_axes}
+        self.axes = {
+            letter: self._create_axis(letter, mock_connection) for letter in available_axes
+        }
         self.current_axis = self.axes["A"]
 
         self.terminal_input = StringVar()
@@ -110,7 +113,9 @@ class App(ttk.Frame):
 
         notebook = ttk.Notebook(rhs, height=440)
 
-        self.mot_details = MotorSettings(self.current_axis, notebook, self.change_axis, available_axes)
+        self.mot_details = MotorSettings(
+            self.current_axis, notebook, self.change_axis, available_axes
+        )
         self.mot_details.pack(fill=BOTH, expand=True)
         notebook.add(self.mot_details, text="Motor Settings")
 
@@ -123,7 +128,7 @@ class App(ttk.Frame):
         rhs.add(self.out_log)
 
         terminal = Entry(rhs, state=NORMAL, textvariable=self.terminal_input)
-        terminal.bind('<Return>', self.send_command)
+        terminal.bind("<Return>", self.send_command)
         rhs.add(terminal)
 
         self.buttons = TestButtonBar(self.current_axis, test_settings, self)
