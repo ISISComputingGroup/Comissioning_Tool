@@ -1,6 +1,7 @@
 import time
+from tkinter import E, StringVar, W, messagebox, ttk
+
 import numpy as np
-from tkinter import StringVar, W, E, ttk, messagebox
 
 from comms.comms import start_recording
 from motor_tests.generic_test import MotorTest
@@ -37,11 +38,19 @@ class EncoderTest(MotorTest):
         return path.format(axis=axis.axis_letter, velo=axis.JOG_SPEED.get(), dir=direct)
 
     def _take_full_data_and_save(self, axis, forward=True):
-        data = self.record_data_between(axis, axis.get_soft_limit(not forward), axis.get_soft_limit(forward))
+        data = self.record_data_between(
+            axis, axis.get_soft_limit(not forward), axis.get_soft_limit(forward)
+        )
 
         name = self._format_save_path(axis, forward)
         self.log("Saving data in {}".format(name))
-        np.savetxt(name, data.T, fmt="%d", delimiter=",", header="{}, {}".format(self.enc_name, self.motor_name))
+        np.savetxt(
+            name,
+            data.T,
+            fmt="%d",
+            delimiter=",",
+            header="{}, {}".format(self.enc_name, self.motor_name),
+        )
 
     def record_data_between(self, axis, start, stop):
         axis.wipe_program()
@@ -54,10 +63,12 @@ class EncoderTest(MotorTest):
         enc_array = "enc"
         steps_array = "steps"
 
-        est_data_trans_time = 6*8*GALIL_ARRAY_MAX/115200
-        est_time = (axis.get_step_range() / axis.JOG_SPEED.get())
+        est_data_trans_time = 6 * 8 * GALIL_ARRAY_MAX / 115200
+        est_time = axis.get_step_range() / axis.JOG_SPEED.get()
 
-        self.log("Running test, this will take approx. {} seconds".format(est_time+est_data_trans_time))
+        self.log(
+            "Running test, this will take approx. {} seconds".format(est_time + est_data_trans_time)
+        )
         prog = start_recording(enc_array, steps_array, est_time)
 
         axis.download_program_and_execute(prog)
@@ -70,7 +81,7 @@ class EncoderTest(MotorTest):
 
         data = np.array([self._get_arr(enc_array), self._get_arr(steps_array)])
 
-        self.log("Took " + str(time.time()-start) + " secs")
+        self.log("Took " + str(time.time() - start) + " secs")
 
         return data
 
@@ -93,8 +104,12 @@ class EncoderTest(MotorTest):
     def get_settings_ui(self, frame):
         frame.grid_columnconfigure(1, weight=1)
         ttk.Label(frame, text="Save as: ").grid(column=0, row=0)
-        ttk.Entry(frame, textvariable=self.save_path).grid(column=1, row=0, padx=5, sticky=W+E)
-        ttk.Button(frame, text="?", command=self._path_help, width=5).grid(column=2, row=0, sticky=E)
+        ttk.Entry(frame, textvariable=self.save_path).grid(column=1, row=0, padx=5, sticky=W + E)
+        ttk.Button(frame, text="?", command=self._path_help, width=5).grid(
+            column=2, row=0, sticky=E
+        )
 
         ttk.Label(frame, text="Test direction: ").grid(column=0, row=1)
-        ttk.OptionMenu(frame, self.direction, self.dir_opts[2], *self.dir_opts).grid(column=1, row=1, sticky=W)
+        ttk.OptionMenu(frame, self.direction, self.dir_opts[2], *self.dir_opts).grid(
+            column=1, row=1, sticky=W
+        )

@@ -1,8 +1,7 @@
-from tkinter import IntVar, BooleanVar, DoubleVar
+from tkinter import BooleanVar, DoubleVar, IntVar
 
-from comms.consts import *
 from comms.comms import format_command, translate_TS
-
+from comms.consts import *
 from file_writer import convert_axis_to_dict
 
 
@@ -12,6 +11,7 @@ class Axis:
 
     This class should be used as an abstraction instead of talking directly to the controller.
     """
+
     high_limit = None  # The position of the high hard limit (steps)
     low_limit = None
 
@@ -59,8 +59,8 @@ class Axis:
         """
         prog_name = "name"
         program = format_command(program, self.axis_letter, prog_name)
-        self.g.GProgramDownload(program, '')
-        self.send(EXECUTE_PROGRAM, "#"+prog_name+",0")
+        self.g.GProgramDownload(program, "")
+        self.send(EXECUTE_PROGRAM, "#" + prog_name + ",0")
 
     def send(self, command, *parameters):
         if command not in SAFE_COMMS and not self.safe_to_move:
@@ -77,7 +77,7 @@ class Axis:
         """
         self.send(START_AXIS)
         sign = 1 if forwards else -1
-        self.send(JOG, sign*self.JOG_SPEED.get())
+        self.send(JOG, sign * self.JOG_SPEED.get())
         self.send(BEGIN)
 
     def get_steps(self):
@@ -171,7 +171,7 @@ class Axis:
         """
         Wipes the program inside the controller by sending an empty program.
         """
-        self.g.GProgramDownload('', '')
+        self.g.GProgramDownload("", "")
 
     def set_soft_limits(self):
         """
@@ -191,10 +191,10 @@ class Axis:
             return None
 
     def get_centre(self):
-        return self.low_limit + (self.high_limit-self.low_limit)//2
+        return self.low_limit + (self.high_limit - self.low_limit) // 2
 
     def get_step_range(self):
-        return self.high_limit-self.low_limit-2*self.offset.get()
+        return self.high_limit - self.low_limit - 2 * self.offset.get()
 
     def wait_for_motion(self):
         self.g.GMotionComplete(self.axis_letter)
@@ -210,6 +210,7 @@ class LoggingAxis(Axis):
     """
     An axis that also logs every command that it sends to the controller.
     """
+
     def __init__(self, g, axis_letter="A", old_axis=None):
         super().__init__(g, axis_letter, old_axis)
 

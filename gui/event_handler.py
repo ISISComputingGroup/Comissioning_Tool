@@ -1,11 +1,12 @@
 import queue
-from threading import Lock, Thread
+from threading import Lock
 
 
-class EventHandler():
+class EventHandler:
     """
     Event handler that listens for new events to send to the UI thread.
     """
+
     lock = Lock()
     in_queue = queue.Queue()
     out_queue = queue.Queue()

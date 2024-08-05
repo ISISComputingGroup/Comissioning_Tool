@@ -1,11 +1,12 @@
-from tkinter import messagebox, BooleanVar
 from functools import partial
+from tkinter import BooleanVar, messagebox
 
 
 class MotorTest:
     """
     An interface for a generic test to be performed on an axis.
     """
+
     def __init__(self, axis, event_queue, logger):
         self.event_queue = event_queue
         self.log = logger

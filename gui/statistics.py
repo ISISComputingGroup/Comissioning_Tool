@@ -1,15 +1,16 @@
-import numpy as np
-from random import random
-from scipy import interpolate
 import os
+from random import random
 
 import matplotlib
-matplotlib.use('TkAgg')
+import numpy as np
+from scipy import interpolate
+
+matplotlib.use("TkAgg")
+
+from tkinter import BOTH, BOTTOM, LEFT, TOP, BooleanVar, Toplevel, Y, filedialog, ttk
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
-
-from tkinter import ttk, BooleanVar, Toplevel, filedialog, TOP, BOTTOM, BOTH, LEFT, Y
 
 
 class Statistics(ttk.Frame):
@@ -54,8 +55,8 @@ class Statistics(ttk.Frame):
 
         color = (random(), random(), random())
         xp = np.linspace(centers[0], centers[-1], 100)
-        self.plot.plot(centers, hist, '.', color=color)
-        self.plot.plot(xp, prob(xp), '-', color=color, label=label)
+        self.plot.plot(centers, hist, ".", color=color)
+        self.plot.plot(xp, prob(xp), "-", color=color, label=label)
 
     def analyse_data(self, name, data):
         i = 0
@@ -76,21 +77,21 @@ class Statistics(ttk.Frame):
 
     def more_details(self):
         window = Toplevel(self)
-        u = " ("+chr(181)+"m)"
+        u = " (" + chr(181) + "m)"
         columns = ("Min Error" + u, "Max Error" + u, "Mean Error" + u, "Standard Deviation" + u)
 
         data_grid = ttk.Treeview(window, columns=columns)
 
         i = 0
-        data_grid.heading('#{}'.format(i), text="File")
+        data_grid.heading("#{}".format(i), text="File")
 
         for c in columns:
             i += 1
-            data_grid.heading('#{}'.format(i), text=c)
+            data_grid.heading("#{}".format(i), text=c)
 
         for name, errors in self.data.iteritems():
             err = errors[1]
-            data_grid.insert('', 0, iid=name, text=name)
+            data_grid.insert("", 0, iid=name, text=name)
             i = 0
             for v in [np.min(err), np.max(err), np.mean(err), np.std(err)]:
                 data_grid.set(name, column=i, value="{:.3g}".format(v))
@@ -101,10 +102,12 @@ class Statistics(ttk.Frame):
     def get_errors(self, data):
         b, c = np.polyfit(data[0], data[1], 1)
 
-        b = self.axis.microstep.get()/(self.axis.motor_res.get()*self.axis.enc_res.get())
+        b = self.axis.microstep.get() / (self.axis.motor_res.get() * self.axis.enc_res.get())
 
         # Calculate the error from the theoretical value and convert to microns
-        vfunc = np.vectorize(lambda x, y: ((b*x+c)-y)*self.axis.motor_res.get()/self.axis.microstep.get())
+        vfunc = np.vectorize(
+            lambda x, y: ((b * x + c) - y) * self.axis.motor_res.get() / self.axis.microstep.get()
+        )
 
         return vfunc(data[0], data[1])
 
@@ -112,7 +115,9 @@ class Statistics(ttk.Frame):
         self.axis = axis
 
     def _load_data(self):
-        files = filedialog.askopenfilename(initialdir=os.getcwd(), filetypes=[("Text", "*.txt")], multiple=1)
+        files = filedialog.askopenfilename(
+            initialdir=os.getcwd(), filetypes=[("Text", "*.txt")], multiple=1
+        )
         for f in files:
             self.analyse_data_from_file(f)
         self.replot()
@@ -135,6 +140,8 @@ class Statistics(ttk.Frame):
         ttk.Button(toolbar, text="Load", command=self._load_data).pack(side=LEFT, fill=Y)
         ttk.Button(toolbar, text="Clear", command=self._clear).pack(side=LEFT, fill=Y)
         ttk.Button(toolbar, text="More Details", command=self.more_details).pack(side=LEFT, fill=Y)
-        ttk.Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(side=LEFT, fill=Y)
+        ttk.Checkbutton(toolbar, text="Prob. Dist.", variable=self.is_gaussian).pack(
+            side=LEFT, fill=Y
+        )
 
         canvas._tkcanvas.pack(side=TOP)

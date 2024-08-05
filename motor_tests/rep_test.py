@@ -1,5 +1,6 @@
-import numpy as np
 from tkinter import IntVar, ttk
+
+import numpy as np
 
 from motor_tests.generic_test import MotorTest
 

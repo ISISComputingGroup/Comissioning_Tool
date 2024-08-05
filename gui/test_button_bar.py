@@ -1,10 +1,11 @@
-from tkinter import ttk, messagebox, NORMAL, DISABLED, X, BOTH, Button
-from comms.comms import stop_all, open_connection
 from threading import Thread
+from tkinter import BOTH, DISABLED, NORMAL, Button, X, messagebox, ttk
+
+from comms.comms import open_connection, stop_all
+from motor_tests.back_lash_test import BacklashTest
 from motor_tests.dir_test import DirectionTest
 from motor_tests.encoder_test import EncoderTest
 from motor_tests.rep_test import RepeatabilityTest
-from motor_tests.back_lash_test import BacklashTest
 
 
 class TestButtonBar(ttk.Frame):
@@ -101,14 +102,18 @@ class TestButtonBar(ttk.Frame):
 
         self.axis.limits_found.trace("w", lambda *args: self.events.put(self.enable_buttons))
 
-        self.stop_button = Button(self, text="STOP MOTORS", command=self.manual_stop, bg='#FF0000')
+        self.stop_button = Button(self, text="STOP MOTORS", command=self.manual_stop, bg="#FF0000")
         self._place_button(self.stop_button)
 
         self.disconnect_button = ttk.Button(self, text="Disconnect", command=self.toggle_connection)
         self._place_button(self.disconnect_button)
 
-        self._place_button(ttk.Button(self, text="Save All Axes Setup", command=self.parent.save_setup))
+        self._place_button(
+            ttk.Button(self, text="Save All Axes Setup", command=self.parent.save_setup)
+        )
 
-        self._place_button(ttk.Button(self, text="Load All Axes Setup", command=self.parent.load_setup))
+        self._place_button(
+            ttk.Button(self, text="Load All Axes Setup", command=self.parent.load_setup)
+        )
 
         self._place_button(ttk.Button(self, text="Exit", command=self.parent.quit))

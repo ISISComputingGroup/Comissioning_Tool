@@ -1,8 +1,7 @@
-from datetime import date
 import json
-from tkinter import filedialog
 import os
-
+from datetime import date
+from tkinter import filedialog
 
 MTR_TYPE_STR = "Motor Type"
 ENC_TYPE_STR = "Encoder Type"
@@ -31,9 +30,11 @@ def save_load_axes(is_saving, axes, log):
     io_method = save_axes if is_saving else load_axes
 
     try:
-        filename = dialog(initialdir=os.getcwd(), filetypes=[("Text", "*{}".format(FILE_EXTENSION))])
+        filename = dialog(
+            initialdir=os.getcwd(), filetypes=[("Text", "*{}".format(FILE_EXTENSION))]
+        )
 
-        if filename != '':
+        if filename != "":
             if not filename.endswith(FILE_EXTENSION):
                 filename += FILE_EXTENSION
 
@@ -76,18 +77,24 @@ def convert_axis_to_dict(axis):
     :param axis: the axis to convert.
     :return: A dictionary describing the axis.
     """
-    details = {MTR_TYPE_STR: axis.motor_type.get(),
-               ENC_TYPE_STR: axis.encoder_type.get(),
-               MTR_RES_STR: axis.motor_res.get(),
-               ENC_RES_STR: axis.enc_res.get(),
-               MICROSTEPS_STR: axis.microstep.get(),
-               LAST_SPEED_STR: axis.JOG_SPEED.get()}
+    details = {
+        MTR_TYPE_STR: axis.motor_type.get(),
+        ENC_TYPE_STR: axis.encoder_type.get(),
+        MTR_RES_STR: axis.motor_res.get(),
+        ENC_RES_STR: axis.enc_res.get(),
+        MICROSTEPS_STR: axis.microstep.get(),
+        LAST_SPEED_STR: axis.JOG_SPEED.get(),
+    }
 
     if axis.limits_found.get():
-        details.update({LOW_LIMIT_STR: axis.low_limit,
-                        HIGH_LIMIT_STR: axis.high_limit,
-                        LIM_DISTANCE_STR: axis.high_limit-axis.low_limit,
-                        SOFT_LIM_OFF_STR: axis.offset.get()})
+        details.update(
+            {
+                LOW_LIMIT_STR: axis.low_limit,
+                HIGH_LIMIT_STR: axis.high_limit,
+                LIM_DISTANCE_STR: axis.high_limit - axis.low_limit,
+                SOFT_LIM_OFF_STR: axis.offset.get(),
+            }
+        )
     return details
 
 

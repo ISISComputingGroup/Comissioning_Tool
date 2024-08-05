@@ -1,7 +1,7 @@
 from random import randint
+from tkinter import IntVar, ttk
 
 import numpy as np
-from tkinter import IntVar, ttk
 
 from comms.comms import start_recording
 from comms.consts import STOP_REC
@@ -28,8 +28,8 @@ class BacklashTest(MotorTest):
     def _calc_backlash(self, enc, motor):
         steps = 0
         for i in range(1, len(motor)):
-            steps += abs(motor[i] - motor[i-1])
-            if enc[i] != enc[i-1] and steps > 0:
+            steps += abs(motor[i] - motor[i - 1])
+            if enc[i] != enc[i - 1] and steps > 0:
                 return steps
 
     def _do_one_test(self, axis, forwards=True):
@@ -39,7 +39,7 @@ class BacklashTest(MotorTest):
 
         mag = randint(100, 300)  # Random movement gives a better statistic
 
-        axis.move_relative(direct*mag)
+        axis.move_relative(direct * mag)
 
         axis.stop()
 
@@ -62,7 +62,7 @@ class BacklashTest(MotorTest):
         fwd_bl = []
         back_bl = []
 
-        for i in range(self.repeats.get()+1):
+        for i in range(self.repeats.get() + 1):
             self.log("Testing forward")
             fwd_bl.append(self._do_one_test(self.axis))
 

@@ -1,9 +1,11 @@
-from string import Template
 import math
-import serial.tools.list_ports
-from mocks.mock_galil import MockGalil
-from comms.consts import *
+from string import Template
+
 import gclib
+import serial.tools.list_ports
+
+from comms.consts import *
+from mocks.mock_galil import MockGalil
 
 
 def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
@@ -15,7 +17,7 @@ def start_recording(enc_name, steps_name, time_to_record, wait_for_speed=True):
     :return: The program to load into the galil
     """
     # Set up arrays
-    time_between_records = (time_to_record/4000.0) * 1000
+    time_between_records = (time_to_record / 4000.0) * 1000
     # TODO: This may only record half the motion due to the floor
     rec_num = int(math.floor(math.log(time_between_records, 2)))  # 2^n msec between records
     rec_num = min(rec_num, 8)  # 8 is maximum
@@ -92,7 +94,7 @@ def format_command(command, axis_letter, *parameters):
 def _check_connection(g):
     try:
         info = g.GInfo()
-    except Exception as e:
+    except Exception:
         return False
     return isinstance(info, str)
 
@@ -103,7 +105,7 @@ def open_connection(g):
     :param g: A galil comms object.
     :return: True if connection successful, false otherwise
     """
-    #TODO: Use g.GAddresses
+    # TODO: Use g.GAddresses
 
     default_port = "COM34"
     open_str = "{} -b 115200"
@@ -113,7 +115,7 @@ def open_connection(g):
         g.GOpen(open_str.format(default_port))
         if _check_connection(g):
             return True
-    except Exception as e:
+    except Exception:
         ports = [p[0] for p in serial.tools.list_ports.comports()]
         if default_port in ports:
             ports.remove(default_port)
@@ -123,7 +125,7 @@ def open_connection(g):
             g.GOpen(open_str.format(p))
             if _check_connection(g):
                 return True
-        except Exception as e:
+        except Exception:
             pass
 
     return False
